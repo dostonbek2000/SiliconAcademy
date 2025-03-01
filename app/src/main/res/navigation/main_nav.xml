@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.siliconacademy.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/coursesFragment"
+        android:name="com.example.siliconacademy.fragments.CoursesFragment"
+        android:label="fragment_courses"
+        tools:layout="@layout/fragment_courses" />
+    <fragment
+        android:id="@+id/teachersFragment"
+        android:name="com.example.siliconacademy.fragments.TeachersFragment"
+        android:label="fragment_teachers"
+        tools:layout="@layout/fragment_teachers" />
+    <fragment
+        android:id="@+id/groupHomeFragment"
+        android:name="com.example.siliconacademy.fragments.GroupHomeFragment"
+        android:label="fragment_group_home"
+        tools:layout="@layout/fragment_group_home" />
+    <fragment
+        android:id="@+id/addGroupFragment"
+        android:name="com.example.siliconacademy.fragments.AddGroupFragment"
+        android:label="fragment_add_group"
+        tools:layout="@layout/fragment_add_group" />
+    <fragment
+        android:id="@+id/studentsFragment"
+        android:name="com.example.siliconacademy.fragments.StudentsFragment"
+        android:label="fragment_students"
+        tools:layout="@layout/fragment_students" />
+    <fragment
+        android:id="@+id/addStudentFragment"
+        android:name="com.example.siliconacademy.fragments.AddStudentFragment"
+        android:label="fragment_add_student"
+        tools:layout="@layout/fragment_add_student" />
+</navigation>
