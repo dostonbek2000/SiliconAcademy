@@ -10,7 +10,7 @@ class Student {
     var fatherName: String? = null
     var groupId: Group? = null
 
-    constructor(id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group?) {
+    constructor(id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group) {
         this.id = id
         this.name = name
         this.surname = surname

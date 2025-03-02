@@ -188,6 +188,8 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 groupsList.add(group)
             } while (cursor.moveToNext())
         }
+        //
+
 
         return groupsList
     }
@@ -219,6 +221,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             getCourseById(cursor.getInt(4))
         )
     }
+    // +
 
     override fun editGroup(group: Group): Int {
         val database = this.writableDatabase
@@ -234,12 +237,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         return database.update(GROUP_TABLE, contentValues, "$GROUP_ID = ?", arrayOf("${group.id}"))
     }
 
-    override fun deleteGroup(group: Group) {
-        getStudentByGroupId(group)
-        val database = this.writableDatabase
-        database.delete(GROUP_TABLE, "$GROUP_ID = ?", arrayOf("${group.id}"))
-        database.close()
-    }
+
 
     override fun addStudent(student: Student) {
         val database = this.writableDatabase
@@ -266,6 +264,31 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             arrayOf("${student.id}")
         )
     }
+    override fun deleteStudent(student: Student) {
+getStudentById(student)
+        val database = this.writableDatabase
+        database.delete(STUDENT_TABLE, "$STUDENT_ID= ?", arrayOf("${student.id}"))
+        database.close()
+    }
+
+    override fun getStudentById(student: Student) {
+        val database = this.writableDatabase
+        val query: String = "select * from $STUDENT_TABLE where $STUDENT_GROUP_ID = ${student.id}"
+        val cursor: Cursor = database.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val studentA = Student(
+
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    getGroupById(cursor.getInt(4))
+                )
+                deleteStudent(studentA)
+            } while (cursor.moveToNext())
+        }
+    }
 
     override fun getAllStudentsList(): ArrayList<Student> {
         val studentsList: ArrayList<Student> = ArrayList()
@@ -287,8 +310,14 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
         return studentsList
     }
+    override fun deleteGroup(group: Group) {
+        getStudentByGroupId(group)
+        val database = this.writableDatabase
+        database.delete(GROUP_TABLE, "$GROUP_ID = ?", arrayOf("${group.id}"))
+        database.close()
+    }
 
-    override fun getGroupById(id: Int): Group {
+    override fun getGroupById(id: Int):Group {
         val database = this.readableDatabase
         val cursor: Cursor =
             database.query(
@@ -322,11 +351,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         )
     }
 
-    override fun deleteStudent(student: Student) {
-        val database = this.writableDatabase
-        database.delete(STUDENT_TABLE, "$STUDENT_ID = ?", arrayOf("${student.id}"))
-        database.close()
-    }
+
 
     override fun getGroupByMentorId(teacher: Teacher) {
         val database = this.writableDatabase

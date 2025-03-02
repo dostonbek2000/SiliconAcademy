@@ -110,16 +110,10 @@ class StudentsFragment : Fragment() {
                 alertDialog.setMessage("Rostan ham o'chirmoqchimisiz?")
                 alertDialog.setPositiveButton("Ha") { _, _ ->
 
-//                    for (i in 0 until codialDatabase.getAllGroupsList().size) {
-//                        if (teacher.id == codialDatabase.getAllGroupsList()[i].teacherId?.id) {
-//                            codialDatabase.deleteGroup(codialDatabase.getAllGroupsList()[i])
-//                        }
-//                    }
-
-                    codialDatabase.deleteStudent(student)
-                    studentsList.remove(student)
-                    adapter.notifyItemRemoved(position)
-                    adapter.notifyItemRangeRemoved(position, studentList.size)
+                    codialDatabase.deleteStudent(student) // Remove from DB
+                    studentsList.remove(student) // Remove from the list
+                    adapter.notifyItemRemoved(position) // Notify the adapter
+                    adapter.notifyItemRangeChanged(position, studentsList.size) // Update positions
                     alertDialog.create().dismiss()
                 }
 
@@ -128,8 +122,8 @@ class StudentsFragment : Fragment() {
                 }
 
                 alertDialog.show()
-
             }
+
         }, studentList)
         binding.recyclerView.adapter = adapter
 

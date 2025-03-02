@@ -28,6 +28,7 @@ interface DatabaseService {
     fun editStudent(student: Student):Int
     fun getAllStudentsList(): ArrayList<Student>
     fun deleteStudent(student: Student)
+    fun getStudentById(student: Student)
     fun getStudentByGroupId(group: Group)
 
 }
