@@ -15,6 +15,7 @@ import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.FragmentAddStudentBinding
 import com.example.siliconacademy.databinding.FragmentStudentsBinding
+import com.example.siliconacademy.models.Payment
 import com.example.siliconacademy.models.Student
 
 class StudentsFragment : Fragment() {
@@ -125,6 +126,52 @@ class StudentsFragment : Fragment() {
                 }
 
                 alertDialog.show()
+            }
+
+            override fun onItemPayClick(student: Student, position: Int) {
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                val paymentBinding = FragmentAddStudentBinding.inflate(requireActivity().layoutInflater)
+                alertDialog.setView(paymentBinding.root)
+
+                paymentBinding.name.setText(student.name)
+                paymentBinding.surname.setText(student.surname)
+                paymentBinding.name.hint = "Month"
+                paymentBinding.fatherName.hint = "Enter amount"
+
+                paymentBinding.save.setOnClickListener {
+                    val amountText = paymentBinding.fatherName.text.toString().trim()
+                    val month = paymentBinding.name.text.toString().trim()
+
+                    if (amountText.isNotEmpty() && month.isNotEmpty()) {
+                        val amount = amountText.toDoubleOrNull()
+                        if (amount != null) {
+                            val payment = Payment(
+                                studentId = student.id!!,
+                                amount = amount,
+                                month = month
+                            )
+
+                            codialDatabase.addPayment(payment) // Save payment
+                            alertDialog.dismiss()
+
+                            // ✅ Refresh the student list to reflect payment
+                            studentList[position] = student // Update student list
+                            adapter.notifyItemChanged(position)
+                        } else {
+                            paymentBinding.fatherName.error = "Invalid amount"
+                        }
+                    } else {
+                        paymentBinding.fatherName.error = "Required"
+                        paymentBinding.name.error = "Required"
+                    }
+                }
+
+                alertDialog.show()
+            }
+
+
+            override fun onItemAttendance(student: Student, position: Int) {
+                TODO("Not yet implemented")
             }
 
         }, studentList)
