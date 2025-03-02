@@ -8,24 +8,37 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.StudentItemBinding
+import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Student
 
-class StudentRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Student>) :
-    RecyclerView.Adapter<StudentRvAdapter.StudentVh>() {
+class StudentRvAdapter(
+    private val onItemClick: OnItemClick,
+    private var itemList: ArrayList<Student>,
+    private val codialDatabase: CodialDatabase // ✅ Database passed as parameter
+) : RecyclerView.Adapter<StudentRvAdapter.StudentVh>() {
 
     inner class StudentVh(private val binding: StudentItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
         fun onBind(student: Student, position: Int) {
-            binding.root.setOnClickListener {
-                onItemClick.onItemClick(student, position)
-            }
             binding.studentFullName.text = "${student.name} ${student.surname}"
 
-            // Handle popup menu on moreOptions click
+            // Fetch latest payment from DB
+            updatePaymentStatus(student)
+
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
+            }
+        }
+
+        private fun updatePaymentStatus(student: Student) {
+            val payments = codialDatabase.getPaymentsByStudentId(student.id!!)
+            if (payments.isNotEmpty()) {
+                val latestPayment = payments.last()
+                binding.paymentStatus.text = "Paid: ${latestPayment.amount} for ${latestPayment.month}"
+            } else {
+                binding.paymentStatus.text = "No Payment"
             }
         }
 
@@ -44,15 +57,13 @@ class StudentRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Stu
                         true
                     }
                     R.id.pay -> {
-                        onItemClick.onItemPayClick(student,position)
+                        onItemClick.onItemPayClick(student, position)
                         true
                     }
                     R.id.attendance -> {
-                        onItemClick.onItemAttendance(student,position)
+                        onItemClick.onItemAttendance(student, position)
                         true
                     }
-
-
                     else -> false
                 }
             }
@@ -62,11 +73,7 @@ class StudentRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Stu
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StudentVh {
         return StudentVh(
-            StudentItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+            StudentItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
 
@@ -82,7 +89,7 @@ class StudentRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Stu
         fun onItemClick(student: Student, position: Int)
         fun onItemEditClick(student: Student, position: Int)
         fun onItemDeleteClick(student: Student, position: Int)
-        fun onItemPayClick(student: Student,position: Int)
-        fun onItemAttendance(student: Student,position: Int)
+        fun onItemPayClick(student: Student, position: Int)
+        fun onItemAttendance(student: Student, position: Int)
     }
 }
