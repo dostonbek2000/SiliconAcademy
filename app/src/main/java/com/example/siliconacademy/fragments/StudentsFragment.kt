@@ -103,6 +103,7 @@ class StudentsFragment : Fragment() {
             }
 
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onItemDeleteClick(student: Student, position: Int) {
                 val alertDialog = AlertDialog.Builder(requireContext())
 
@@ -113,7 +114,9 @@ class StudentsFragment : Fragment() {
                     codialDatabase.deleteStudent(student) // Remove from DB
                     studentsList.remove(student) // Remove from the list
                     adapter.notifyItemRemoved(position) // Notify the adapter
-                    adapter.notifyItemRangeChanged(position, studentsList.size) // Update positions
+                    adapter.notifyDataSetChanged()
+                    adapter.notifyItemRangeRemoved(position,studentList.size)
+                    adapter.notifyItemRangeChanged(position, studentList.size) // Update positions
                     alertDialog.create().dismiss()
                 }
 
@@ -138,7 +141,6 @@ class StudentsFragment : Fragment() {
             codialDatabase.editGroup(group)
         }
 
-
-        return binding.root
+ return binding.root
     }
 }
