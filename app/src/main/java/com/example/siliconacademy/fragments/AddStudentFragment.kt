@@ -1,6 +1,7 @@
 package com.example.siliconacademy.fragments
 
 import Group
+import Student
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +10,6 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.databinding.FragmentAddStudentBinding
-import com.example.siliconacademy.models.Student
 
 class AddStudentFragment : Fragment() {
 
@@ -36,7 +36,7 @@ class AddStudentFragment : Fragment() {
             val surname: String = binding.surname.text.toString()
             val fatherName: String = binding.fatherName.text.toString()
 
-            codialDatabase.addStudent(Student(name, surname, fatherName, group))
+            codialDatabase.addStudent(Student(name, surname, fatherName, group,))
             findNavController().popBackStack()
         }
 

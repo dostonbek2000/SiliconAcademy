@@ -1,9 +1,11 @@
 package com.example.siliconacademy.utils
 
+import com.example.siliconacademy.models.Payment
+
 object Content {
 
     const val DB_NAME: String = "codial.db"
-    const val DB_VERSION: Int = 1
+    const val DB_VERSION: Int = 4
 
     const val COURSE_TABLE: String = "courses"
     const val COURSE_ID: String = "id"
@@ -33,5 +35,11 @@ object Content {
     const val STUDENT_SURNAME: String = "surname"
     const val STUDENT_FATHER_NAME: String = "fatherName"
     const val STUDENT_GROUP_ID: String = "groupId"
+
+    const val PAYMENT_TABLE:String="payment"
+    const val ID:String="id"
+    const val PAYMENT_ID:String="Pid"
+    const val PAYMENT_AMOUNT:String="amount"
+    const val PAYMENT_MONTH:String="month"
 
 }

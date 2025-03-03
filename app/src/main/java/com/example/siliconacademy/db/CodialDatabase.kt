@@ -1,6 +1,7 @@
 package com.example.siliconacademy.db
 
 import Group
+import Student
 import Teacher
 import android.content.ContentValues
 import android.content.Context
@@ -10,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
-import com.example.siliconacademy.models.Student
+import com.example.siliconacademy.utils.Content
 import com.example.siliconacademy.utils.Content.COURSE_DESCRIPTION
 import com.example.siliconacademy.utils.Content.COURSE_ID
 import com.example.siliconacademy.utils.Content.COURSE_TABLE
@@ -26,6 +27,8 @@ import com.example.siliconacademy.utils.Content.GROUP_TEACHER_ID
 import com.example.siliconacademy.utils.Content.GROUP_TEACHER_NAME
 import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
+import com.example.siliconacademy.utils.Content.PAYMENT_ID
+import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
 import com.example.siliconacademy.utils.Content.STUDENT_ID
@@ -50,15 +53,15 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             "create table $GROUP_TABLE($GROUP_ID integer not null primary key autoincrement unique, $GROUP_POSITION integer not null, $GROUP_TITLE text not null, $GROUP_TEACHER_NAME text not null, $GROUP_TIME text not null, $GROUP_DAY text not null, $GROUP_TEACHER_ID integer not null, $GROUP_COURSE_ID integer not null, foreign key($GROUP_TEACHER_ID) references $TEACHERS_TABLE($TEACHERS_ID), foreign key($GROUP_COURSE_ID) references $COURSE_TABLE($COURSE_ID))"
         val studentQuery: String =
             "create table $STUDENT_TABLE($STUDENT_ID integer not null primary key autoincrement unique, $STUDENT_NAME text not null, $STUDENT_SURNAME text not null, $STUDENT_FATHER_NAME text not null, $STUDENT_GROUP_ID integer not null, foreign key($STUDENT_GROUP_ID) references $GROUP_TABLE($GROUP_ID))"
-        val createPaymentTable:String = """
-        CREATE TABLE PaymentTable (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            studentId INTEGER,
-            amount REAL,
-            month TEXT,
-            FOREIGN KEY (studentId) REFERENCES StudentsTable(id)
-        )
-    """
+        val createPaymentTable = """
+        CREATE TABLE ${Content.PAYMENT_TABLE} (
+            ${Content.PAYMENT_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${Content.STUDENT_ID} INTEGER,
+            ${Content.PAYMENT_AMOUNT} REAL,
+            ${Content.PAYMENT_MONTH} TEXT
+        );
+    """.trimIndent()
+
         db?.execSQL(createPaymentTable)
         db?.execSQL(courseQuery)
         db?.execSQL(teacherQuery)
@@ -67,18 +70,27 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-
+        if (oldVersion < 3) { // Update version number accordingly
+            db?.execSQL("""
+            CREATE TABLE IF NOT EXISTS ${Content.PAYMENT_TABLE} (
+                ${Content.PAYMENT_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
+                ${Content.STUDENT_ID} INTEGER,
+                ${Content.PAYMENT_AMOUNT} REAL,
+                ${Content.PAYMENT_MONTH} TEXT
+            );
+        """.trimIndent())
+        }
     }
     fun getPaymentsByStudentId(studentId: Int): List<Payment> {
         val db = this.readableDatabase
         val list = ArrayList<Payment>()
-        val cursor = db.rawQuery("SELECT * FROM PaymentTable WHERE studentId = ?", arrayOf(studentId.toString()))
+        val cursor = db.rawQuery("SELECT * FROM $PAYMENT_TABLE WHERE $PAYMENT_ID = ?", arrayOf(studentId.toString()))
 
         while (cursor.moveToNext()) {
             val payment = Payment(
                 id = cursor.getInt(0),
                 studentId = cursor.getInt(1),
-                amount = cursor.getDouble(2),
+                amount = cursor.getDouble(2).toString(),
                 month = cursor.getString(3)
             )
             list.add(payment)
@@ -91,11 +103,11 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     fun addPayment(payment: Payment) {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put("studentId", payment.studentId)
+        contentValues.put("id", payment.studentId)
         contentValues.put("amount", payment.amount)
         contentValues.put("month", payment.month)
 
-        db.insert("PaymentTable", null, contentValues)
+        db.insert("$PAYMENT_TABLE", null, contentValues)
         db.close()
     }
 

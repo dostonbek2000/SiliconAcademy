@@ -1,9 +1,9 @@
 package com.example.siliconacademy.interfaces
 
 import Group
+import Student
 import Teacher
 import com.example.siliconacademy.models.Course
-import com.example.siliconacademy.models.Student
 
 interface DatabaseService {
 

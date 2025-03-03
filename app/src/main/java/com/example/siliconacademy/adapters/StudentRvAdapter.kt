@@ -1,5 +1,6 @@
 package com.example.siliconacademy.adapters
 
+import Student
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.StudentItemBinding
 import com.example.siliconacademy.db.CodialDatabase
-import com.example.siliconacademy.models.Student
 
 class StudentRvAdapter(
     private val onItemClick: OnItemClick,
@@ -31,16 +31,22 @@ class StudentRvAdapter(
                 showPopupMenu(view, student, position)
             }
         }
-
-        private fun updatePaymentStatus(student: Student) {
+        fun updatePaymentStatus(student: Student) {
             val payments = codialDatabase.getPaymentsByStudentId(student.id!!)
+
             if (payments.isNotEmpty()) {
                 val latestPayment = payments.last()
+                student.latestPaymentAmount = latestPayment.amount// ✅ Update model
+                student.latestPaymentMonth = latestPayment.month
+
                 binding.paymentStatus.text = "Paid: ${latestPayment.amount} for ${latestPayment.month}"
             } else {
+                student.latestPaymentAmount = null
+                student.latestPaymentMonth = null
                 binding.paymentStatus.text = "No Payment"
             }
         }
+
 
         private fun showPopupMenu(view: View, student: Student, position: Int) {
             val popupMenu = PopupMenu(view.context, view)
@@ -78,7 +84,11 @@ class StudentRvAdapter(
     }
 
     override fun onBindViewHolder(holder: StudentVh, position: Int) {
-        holder.onBind(itemList[position], position)
+        val student = itemList[position]
+        holder.onBind(student, position)
+        holder.updatePaymentStatus(student)
+
+
     }
 
     override fun getItemCount(): Int {
