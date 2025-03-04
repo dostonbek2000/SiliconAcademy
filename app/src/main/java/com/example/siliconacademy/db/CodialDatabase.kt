@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
+import com.example.siliconacademy.models.Results
 import com.example.siliconacademy.utils.Content
 import com.example.siliconacademy.utils.Content.COURSE_DESCRIPTION
 import com.example.siliconacademy.utils.Content.COURSE_ID
@@ -29,6 +30,12 @@ import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
 import com.example.siliconacademy.utils.Content.PAYMENT_ID
 import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
+import com.example.siliconacademy.utils.Content.RESULT_DESCC
+import com.example.siliconacademy.utils.Content.RESULT_ID
+import com.example.siliconacademy.utils.Content.RESULT_IMAGE
+import com.example.siliconacademy.utils.Content.RESULT_NAME
+import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
+import com.example.siliconacademy.utils.Content.RESULT_TABLE
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
 import com.example.siliconacademy.utils.Content.STUDENT_ID
@@ -61,7 +68,8 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             ${Content.PAYMENT_MONTH} TEXT
         );
     """.trimIndent()
-
+        val result:String="create table $RESULT_TABLE($RESULT_ID integer not null primary key autoincrement unique,$RESULT_NAME text not null,$RESULT_SUBJECT text not null, $RESULT_DESCC text not null, $RESULT_IMAGE text not null)"
+db?.execSQL(result)
         db?.execSQL(createPaymentTable)
         db?.execSQL(courseQuery)
         db?.execSQL(teacherQuery)
@@ -71,20 +79,26 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 3) { // Update version number accordingly
-            db?.execSQL("""
+            db?.execSQL(
+                """
             CREATE TABLE IF NOT EXISTS ${Content.PAYMENT_TABLE} (
                 ${Content.PAYMENT_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
                 ${Content.STUDENT_ID} INTEGER,
                 ${Content.PAYMENT_AMOUNT} REAL,
                 ${Content.PAYMENT_MONTH} TEXT
             );
-        """.trimIndent())
+        """.trimIndent()
+            )
         }
     }
+
     fun getPaymentsByStudentId(studentId: Int): List<Payment> {
         val db = this.readableDatabase
         val list = ArrayList<Payment>()
-        val cursor = db.rawQuery("SELECT * FROM $PAYMENT_TABLE WHERE $PAYMENT_ID = ?", arrayOf(studentId.toString()))
+        val cursor = db.rawQuery(
+            "SELECT * FROM $PAYMENT_TABLE WHERE $PAYMENT_ID = ?",
+            arrayOf(studentId.toString())
+        )
 
         while (cursor.moveToNext()) {
             val payment = Payment(
@@ -291,7 +305,6 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     }
 
 
-
     override fun addStudent(student: Student) {
         val database = this.writableDatabase
         val contentValues = ContentValues()
@@ -302,6 +315,22 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         database.insert(STUDENT_TABLE, null, contentValues)
         database.close()
     }
+
+    override fun addResult(result: Results) {
+        val database=this.writableDatabase
+        val contentValues=ContentValues()
+        contentValues.put(RESULT_NAME,result.name)
+        contentValues.put(RESULT_SUBJECT,result.subject)
+        contentValues.put(RESULT_DESCC,result.desc)
+        contentValues.put(RESULT_IMAGE,result.image)
+        contentValues.put(RESULT_ID,result.studentId)
+        database.insert(RESULT_TABLE,null,contentValues)
+        database.close()
+
+
+
+    }
+
     override fun editStudent(student: Student): Int {
         val database = this.writableDatabase
         val contentValues = ContentValues()
@@ -317,8 +346,9 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             arrayOf("${student.id}")
         )
     }
+
     override fun deleteStudent(student: Student) {
-getStudentById(student)
+        getStudentById(student)
         val database = this.writableDatabase
         database.delete(STUDENT_TABLE, "$STUDENT_ID= ?", arrayOf("${student.id}"))
         database.close()
@@ -331,7 +361,6 @@ getStudentById(student)
         if (cursor.moveToFirst()) {
             do {
                 val studentA = Student(
-
                     cursor.getInt(0),
                     cursor.getString(1),
                     cursor.getString(2),
@@ -363,6 +392,7 @@ getStudentById(student)
 
         return studentsList
     }
+
     override fun deleteGroup(group: Group) {
         getStudentByGroupId(group)
         val database = this.writableDatabase
@@ -370,7 +400,7 @@ getStudentById(student)
         database.close()
     }
 
-    override fun getGroupById(id: Int):Group {
+    override fun getGroupById(id: Int): Group {
         val database = this.readableDatabase
         val cursor: Cursor =
             database.query(
@@ -403,7 +433,6 @@ getStudentById(student)
             getCourseById(cursor.getInt(7))
         )
     }
-
 
 
     override fun getGroupByMentorId(teacher: Teacher) {
@@ -444,4 +473,6 @@ getStudentById(student)
             } while (cursor.moveToNext())
         }
     }
+
+
 }

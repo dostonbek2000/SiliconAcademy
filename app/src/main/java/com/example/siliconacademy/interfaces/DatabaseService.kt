@@ -4,6 +4,7 @@ import Group
 import Student
 import Teacher
 import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Results
 
 interface DatabaseService {
 
@@ -30,6 +31,7 @@ interface DatabaseService {
     fun deleteStudent(student: Student)
     fun getStudentById(student: Student)
     fun getStudentByGroupId(group: Group)
+    fun addResult(result: Results)
 
 
 

@@ -4,5 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="mainColor">#00D2E1</color>
     <color name="secondColor">#00D2E1</color>
+    <color name="blue">#0042E6</color>
+
 
 </resources>
