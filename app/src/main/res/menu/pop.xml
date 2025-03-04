@@ -21,5 +21,8 @@
         android:icon="@drawable/pen"
         android:title="Davomat olish"
          />
+    <item
+        android:id="@+id/result"
+       android:title="Natijalar"/>
 
 </menu>

@@ -46,7 +46,7 @@ object Content {
     const val RESULT_ID:String="ID"
     const val RESULT_NAME:String="NAME"
     const val RESULT_SUBJECT:String="SUBJECT"
-    const val RESULT_DESCC:String="DESCC"
+    const val RESULT_DESCC:String="DESC"
     const val RESULT_IMAGE:String="IMAGE"
 
 }
