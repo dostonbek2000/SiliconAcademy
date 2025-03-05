@@ -8,6 +8,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
@@ -33,9 +35,10 @@ import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_DESCC
 import com.example.siliconacademy.utils.Content.RESULT_ID
 import com.example.siliconacademy.utils.Content.RESULT_IMAGE
-import com.example.siliconacademy.utils.Content.RESULT_NAME
 import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
+import com.example.siliconacademy.utils.Content.RESULT_S_NAME
 import com.example.siliconacademy.utils.Content.RESULT_TABLE
+import com.example.siliconacademy.utils.Content.RESULT_T_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
 import com.example.siliconacademy.utils.Content.STUDENT_ID
@@ -48,66 +51,108 @@ import com.example.siliconacademy.utils.Content.TEACHERS_ID
 import com.example.siliconacademy.utils.Content.TEACHERS_NAME
 import com.example.siliconacademy.utils.Content.TEACHERS_SURNAME
 import com.example.siliconacademy.utils.Content.TEACHERS_TABLE
+class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION), DatabaseService {
 
-class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION),
-    DatabaseService {
     override fun onCreate(db: SQLiteDatabase?) {
-        val courseQuery: String =
-            "create table $COURSE_TABLE($COURSE_ID integer not null primary key autoincrement unique, $COURSE_TITLE text not null, $COURSE_DESCRIPTION text not null)"
-        val teacherQuery: String =
-            "create table $TEACHERS_TABLE($TEACHERS_ID integer not null primary key autoincrement unique, $TEACHERS_NAME text not null, $TEACHERS_SURNAME text not null, $TEACHERS_FATHER text not null, $TEACHERS_COURSE_ID integer not null, foreign key($TEACHERS_COURSE_ID) references $COURSE_TABLE($COURSE_ID))"
-        val groupQuery: String =
-            "create table $GROUP_TABLE($GROUP_ID integer not null primary key autoincrement unique, $GROUP_POSITION integer not null, $GROUP_TITLE text not null, $GROUP_TEACHER_NAME text not null, $GROUP_TIME text not null, $GROUP_DAY text not null, $GROUP_TEACHER_ID integer not null, $GROUP_COURSE_ID integer not null, foreign key($GROUP_TEACHER_ID) references $TEACHERS_TABLE($TEACHERS_ID), foreign key($GROUP_COURSE_ID) references $COURSE_TABLE($COURSE_ID))"
-        val studentQuery: String =
-            "create table $STUDENT_TABLE($STUDENT_ID integer not null primary key autoincrement unique, $STUDENT_NAME text not null, $STUDENT_SURNAME text not null, $STUDENT_FATHER_NAME text not null, $STUDENT_GROUP_ID integer not null, foreign key($STUDENT_GROUP_ID) references $GROUP_TABLE($GROUP_ID))"
-        val createPaymentTable = """
-        CREATE TABLE ${Content.PAYMENT_TABLE} (
-            ${Content.PAYMENT_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${Content.STUDENT_ID} INTEGER,
-            ${Content.PAYMENT_AMOUNT} REAL,
-            ${Content.PAYMENT_MONTH} TEXT
-        );
-    """.trimIndent()
-        val result:String="create table $RESULT_TABLE($RESULT_ID integer not null primary key autoincrement unique,$RESULT_NAME text not null,$RESULT_SUBJECT text not null, $RESULT_DESCC text not null, $RESULT_IMAGE text not null)"
-db?.execSQL(result)
-        db?.execSQL(createPaymentTable)
+        db?.execSQL("PRAGMA foreign_keys = ON;")
+
+        val courseQuery = """
+            CREATE TABLE $COURSE_TABLE (
+                $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COURSE_TITLE TEXT NOT NULL,
+                $COURSE_DESCRIPTION TEXT NOT NULL
+            );
+        """.trimIndent()
+
+        val teacherQuery = """
+            CREATE TABLE $TEACHERS_TABLE (
+                $TEACHERS_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $TEACHERS_NAME TEXT NOT NULL,
+                $TEACHERS_SURNAME TEXT NOT NULL,
+                $TEACHERS_FATHER TEXT NOT NULL,
+                $TEACHERS_COURSE_ID INTEGER NOT NULL,
+                FOREIGN KEY ($TEACHERS_COURSE_ID) REFERENCES $COURSE_TABLE($COURSE_ID) ON DELETE CASCADE
+            );
+        """.trimIndent()
+
+        val groupQuery = """
+            CREATE TABLE $GROUP_TABLE (
+                $GROUP_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $GROUP_POSITION INTEGER NOT NULL,
+                $GROUP_TITLE TEXT NOT NULL,
+                $GROUP_TIME TEXT NOT NULL,
+                $GROUP_DAY TEXT NOT NULL,
+                $GROUP_TEACHER_ID INTEGER NOT NULL,
+                $GROUP_COURSE_ID INTEGER NOT NULL,
+                FOREIGN KEY ($GROUP_TEACHER_ID) REFERENCES $TEACHERS_TABLE($TEACHERS_ID) ON DELETE CASCADE,
+                FOREIGN KEY ($GROUP_COURSE_ID) REFERENCES $COURSE_TABLE($COURSE_ID) ON DELETE CASCADE
+            );
+        """.trimIndent()
+
+        val studentQuery = """
+            CREATE TABLE $STUDENT_TABLE (
+                $STUDENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $STUDENT_NAME TEXT NOT NULL,
+                $STUDENT_SURNAME TEXT NOT NULL,
+                $STUDENT_FATHER_NAME TEXT NOT NULL,
+                $STUDENT_GROUP_ID INTEGER NOT NULL,
+                FOREIGN KEY ($STUDENT_GROUP_ID) REFERENCES $GROUP_TABLE($GROUP_ID) ON DELETE CASCADE
+            );
+        """.trimIndent()
+
+        val paymentQuery = """
+            CREATE TABLE $PAYMENT_TABLE (
+                $PAYMENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $STUDENT_ID INTEGER NOT NULL,
+                ${Content.PAYMENT_AMOUNT} REAL NOT NULL,
+                ${Content.PAYMENT_MONTH} TEXT NOT NULL,
+                FOREIGN KEY ($STUDENT_ID) REFERENCES $STUDENT_TABLE($STUDENT_ID) ON DELETE CASCADE
+            );
+        """.trimIndent()
+
+        val resultQuery = """
+            CREATE TABLE $RESULT_TABLE ("
+                $RESULT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $RESULT_S_NAME TEXT NOT NULL,
+                $RESULT_T_NAME TEXT NOT NULL,
+                $RESULT_SUBJECT TEXT NOT NULL,
+                $RESULT_DESCC TEXT NOT NULL,
+                $RESULT_IMAGE TEXT NOT NULL
+            ");
+        """.trimIndent()
+
         db?.execSQL(courseQuery)
         db?.execSQL(teacherQuery)
         db?.execSQL(groupQuery)
         db?.execSQL(studentQuery)
+        db?.execSQL(paymentQuery)
+        db?.execSQL(resultQuery)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 3) { // Update version number accordingly
-            db?.execSQL(
-                """
-            CREATE TABLE IF NOT EXISTS ${Content.PAYMENT_TABLE} (
-                ${Content.PAYMENT_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-                ${Content.STUDENT_ID} INTEGER,
-                ${Content.PAYMENT_AMOUNT} REAL,
-                ${Content.PAYMENT_MONTH} TEXT
-            );
-        """.trimIndent()
-            )
+        if (oldVersion < 3) {
+            db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
+            onCreate(db)
         }
     }
 
     fun getPaymentsByStudentId(studentId: Int): List<Payment> {
         val db = this.readableDatabase
-        val list = ArrayList<Payment>()
+        val list = mutableListOf<Payment>()
         val cursor = db.rawQuery(
-            "SELECT * FROM $PAYMENT_TABLE WHERE $PAYMENT_ID = ?",
-            arrayOf(studentId.toString())
+            "SELECT * FROM $PAYMENT_TABLE WHERE $STUDENT_ID = ?", arrayOf(studentId.toString())
         )
 
         while (cursor.moveToNext()) {
-            val payment = Payment(
-                id = cursor.getInt(0),
-                studentId = cursor.getInt(1),
-                amount = cursor.getDouble(2).toString(),
-                month = cursor.getString(3)
+            list.add(
+                Payment(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(PAYMENT_ID)),
+                    studentId = cursor.getInt(cursor.getColumnIndexOrThrow(STUDENT_ID)),
+                    amount = cursor.getDouble(cursor.getColumnIndexOrThrow(Content.PAYMENT_AMOUNT)).toString(),
+                    month = cursor.getString(cursor.getColumnIndexOrThrow(Content.PAYMENT_MONTH))
+                )
             )
-            list.add(payment)
         }
         cursor.close()
         db.close()
@@ -116,39 +161,46 @@ db?.execSQL(result)
 
     fun addPayment(payment: Payment) {
         val db = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put("id", payment.studentId)
-        contentValues.put("amount", payment.amount)
-        contentValues.put("month", payment.month)
-
-        db.insert("$PAYMENT_TABLE", null, contentValues)
+        val contentValues = ContentValues().apply {
+            put(STUDENT_ID, payment.studentId)
+            put(Content.PAYMENT_AMOUNT, payment.amount)
+            put(Content.PAYMENT_MONTH, payment.month)
+        }
+        db.insert(PAYMENT_TABLE, null, contentValues)
         db.close()
     }
 
-
     override fun addCourse(course: Course) {
         val database = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(COURSE_TITLE, course.title)
-        contentValues.put(COURSE_DESCRIPTION, course.desc)
+        val contentValues = ContentValues().apply {
+            put(COURSE_TITLE, course.title)
+            put(COURSE_DESCRIPTION, course.desc)
+        }
         database.insert(COURSE_TABLE, null, contentValues)
         database.close()
     }
 
     override fun getAllCoursesList(): ArrayList<Course> {
         val coursesList = ArrayList<Course>()
-        val query: String = "select * from $COURSE_TABLE"
+        val query = "SELECT * FROM $COURSE_TABLE"
         val database = this.readableDatabase
         val cursor: Cursor = database.rawQuery(query, null)
+
         if (cursor.moveToFirst()) {
             do {
-                val course = Course(cursor.getInt(0), cursor.getString(1), cursor.getString(2))
-                coursesList.add(course)
+                coursesList.add(
+                    Course(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COURSE_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COURSE_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COURSE_DESCRIPTION))
+                    )
+                )
             } while (cursor.moveToNext())
         }
-
+        cursor.close()
         return coursesList
     }
+
 
     override fun addTeacher(teacher: Teacher) {
         val database = this.writableDatabase
@@ -317,16 +369,16 @@ db?.execSQL(result)
     }
 
     override fun addResult(result: Results) {
-        val database=this.writableDatabase
-        val contentValues=ContentValues()
-        contentValues.put(RESULT_NAME,result.name)
-        contentValues.put(RESULT_SUBJECT,result.subject)
-        contentValues.put(RESULT_DESCC,result.desc)
-        contentValues.put(RESULT_IMAGE,result.image)
-        contentValues.put(RESULT_ID,result.studentId)
-        database.insert(RESULT_TABLE,null,contentValues)
+        val database = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put(RESULT_S_NAME, result.name)
+        contentValues.put(RESULT_T_NAME, result.teacherName)
+        contentValues.put(RESULT_SUBJECT, result.subject)
+        contentValues.put(RESULT_DESCC, result.desc)
+        contentValues.put(RESULT_IMAGE, result.image)
+        contentValues.put(RESULT_ID, result.id)
+        database.insert(RESULT_TABLE, null, contentValues)
         database.close()
-
 
 
     }
@@ -474,5 +526,16 @@ db?.execSQL(result)
         }
     }
 
+    companion object {
+        @Volatile
+        private var INSTANCE: CodialDatabase? = null
 
-}
+        fun getInstance(context: Context): CodialDatabase {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: CodialDatabase(context).also { INSTANCE = it }
+            }
+        }
+        }
+    }
+
+

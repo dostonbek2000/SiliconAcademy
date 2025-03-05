@@ -5,7 +5,7 @@ import com.example.siliconacademy.models.Payment
 object Content {
 
     const val DB_NAME: String = "codial.db"
-    const val DB_VERSION: Int = 4
+    const val DB_VERSION: Int = 5
 
     const val COURSE_TABLE: String = "courses"
     const val COURSE_ID: String = "id"
@@ -37,16 +37,17 @@ object Content {
     const val STUDENT_GROUP_ID: String = "groupId"
 
     const val PAYMENT_TABLE:String="payment"
-    const val ID:String="id"
-    const val PAYMENT_ID:String="Pid"
+
+    const val PAYMENT_ID:String="id"
     const val PAYMENT_AMOUNT:String="amount"
     const val PAYMENT_MONTH:String="month"
 
-    const val RESULT_TABLE:String="RESULT"
-    const val RESULT_ID:String="ID"
-    const val RESULT_NAME:String="NAME"
-    const val RESULT_SUBJECT:String="SUBJECT"
-    const val RESULT_DESCC:String="DESC"
-    const val RESULT_IMAGE:String="IMAGE"
+    const val RESULT_TABLE:String="result"
+    const val RESULT_ID:String="id"
+    const val RESULT_S_NAME:String="s name"
+    const val RESULT_T_NAME:String="t name"
+    const val RESULT_SUBJECT:String="subject"
+    const val RESULT_DESCC:String="desc"
+    const val RESULT_IMAGE:String="image"
 
 }

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import com.example.siliconacademy.databinding.FragmentAddResultBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Results
-
 class AddResultFragment : Fragment() {
 
     private lateinit var binding: FragmentAddResultBinding
@@ -25,6 +24,8 @@ class AddResultFragment : Fragment() {
     ): View {
         binding = FragmentAddResultBinding.inflate(inflater, container, false)
 
+        // Initialize the database here
+        database = CodialDatabase.getInstance(requireContext()) // Ensure this method exists in CodialDatabase
 
         binding.imageButton.setOnClickListener {
             pickImageFromGallery()
@@ -56,15 +57,17 @@ class AddResultFragment : Fragment() {
         val name = binding.name.text.toString().trim()
         val subject = binding.subject.text.toString().trim()
         val desc = binding.desc.text.toString().trim()
+        val teacherName = binding.teacherName.text.toString().trim()
 
-        if (name.isEmpty() || subject.isEmpty() || desc.isEmpty() || imageUri == null) {
+        if (name.isEmpty() || subject.isEmpty() || desc.isEmpty() || imageUri == null || teacherName.isEmpty()) {
             Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
             return
         }
 
         val result = Results(
-            studentId = 1, // Replace with actual student ID
+            id = 1, // Replace with actual student ID
             name = name,
+            teacherName = teacherName,
             subject = subject,
             desc = desc,
             image = imageUri.toString()
@@ -79,3 +82,4 @@ class AddResultFragment : Fragment() {
         private const val IMAGE_PICK_CODE = 1000
     }
 }
+

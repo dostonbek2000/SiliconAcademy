@@ -40,4 +40,29 @@
         android:name="com.example.siliconacademy.fragments.AddStudentFragment"
         android:label="fragment_add_student"
         tools:layout="@layout/fragment_add_student" />
+    <fragment
+        android:id="@+id/paymentFragment"
+        android:name="com.example.siliconacademy.fragments.PaymentFragment"
+        android:label="fragment_payment"
+        tools:layout="@layout/fragment_payment" />
+    <fragment
+        android:id="@+id/addResultFragment"
+        android:name="com.example.siliconacademy.fragments.AddResultFragment"
+        android:label="fragment_add_result"
+        tools:layout="@layout/fragment_add_result" />
+    <fragment
+        android:id="@+id/groupsFragment"
+        android:name="com.example.siliconacademy.fragments.GroupsFragment"
+        android:label="fragment_groups"
+        tools:layout="@layout/fragment_groups" />
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.example.siliconacademy.fragments.ResultFragment"
+        android:label="fragment_result"
+        tools:layout="@layout/fragment_result" />
+    <fragment
+        android:id="@+id/courseInfoFragment"
+        android:name="com.example.siliconacademy.fragments.CourseInfoFragment"
+        android:label="fragment_course_info"
+        tools:layout="@layout/fragment_course_info" />
 </navigation>
