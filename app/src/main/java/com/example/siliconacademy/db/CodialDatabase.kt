@@ -383,6 +383,30 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     }
 
+    override fun getAllResultsList(): ArrayList<Results> {
+        val resultsList: ArrayList<Results> = ArrayList()
+        val query: String = "select * from $RESULT_TABLE"
+        val database = this.readableDatabase
+        val cursor: Cursor = database.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            do {
+                val result = Results(
+
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(4),
+                    cursor.getString(5)
+
+                )
+                    resultsList.add(result)
+            } while (cursor.moveToNext())
+        }
+
+        return resultsList
+    }
+
     override fun editStudent(student: Student): Int {
         val database = this.writableDatabase
         val contentValues = ContentValues()

@@ -32,6 +32,7 @@ interface DatabaseService {
     fun getStudentById(student: Student)
     fun getStudentByGroupId(group: Group)
     fun addResult(result: Results)
+    fun getAllResultsList():ArrayList<Results>
 
 
 
