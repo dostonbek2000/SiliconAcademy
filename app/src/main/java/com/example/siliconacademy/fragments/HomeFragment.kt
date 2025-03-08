@@ -46,7 +46,7 @@ class HomeFragment : Fragment() {
             )
         }
         binding.results.setOnClickListener {
-            findNavController().navigate(R.id.resultFragment, bundleOf("query" to 4))
+            findNavController().navigate(R.id.resultHomeFragment, bundleOf("query" to 4))
         }
 
         return binding.root

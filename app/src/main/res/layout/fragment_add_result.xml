@@ -43,16 +43,53 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:id="@+id/teacherName_layout"
+        android:id="@+id/age_layout"
         app:layout_constraintTop_toBottomOf="@id/name_layout"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="18sp"
+            android:inputType="number"
             android:textColor="@color/black"
+            android:hint="Yoshi"
+            android:id="@+id/age"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/test_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/age_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Test turi"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/teacher_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/test_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/teacherName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="Ustoz ismi"
-            android:id="@+id/teacher_name"/>
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
@@ -62,31 +99,13 @@
         android:layout_margin="20dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/teacherName_layout">
+        app:layout_constraintTop_toBottomOf="@id/teacher_layout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/subject"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Fan"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/desc_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subject_layout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Qisqacha malumot"
             android:textColor="@color/black"
             android:textSize="18sp" />
 
@@ -99,8 +118,8 @@
         android:textSize="18sp"
         android:id="@+id/image_button"
         android:clickable="true"
-        app:layout_constraintTop_toBottomOf="@id/desc_layout"
-        app:layout_constraintLeft_toLeftOf="@id/desc_layout"
+        app:layout_constraintTop_toBottomOf="@id/subject_layout"
+        app:layout_constraintLeft_toLeftOf="@id/subject_layout"
         android:layout_margin="10dp"/>
     <ImageView
         android:layout_width="200dp"

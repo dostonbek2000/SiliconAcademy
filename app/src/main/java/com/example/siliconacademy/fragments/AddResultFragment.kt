@@ -56,10 +56,13 @@ class AddResultFragment : Fragment() {
     private fun saveResult() {
         val name = binding.name.text.toString().trim()
         val subject = binding.subject.text.toString().trim()
-        val desc = binding.desc.text.toString().trim()
+        val age=binding.age.text.toString().trim()
+        val test=binding.type.toString().trim()
+
         val teacherName = binding.teacherName.text.toString().trim()
 
-        if (name.isEmpty() || subject.isEmpty() || desc.isEmpty() || imageUri == null || teacherName.isEmpty()) {
+
+        if (name.isEmpty() || subject.isEmpty() || age.isEmpty()|| subject.isEmpty() ||test.isEmpty()|| teacherName.isEmpty() || imageUri == null || teacherName.isEmpty()) {
             Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
             return
         }
@@ -67,9 +70,11 @@ class AddResultFragment : Fragment() {
         val result = Results(
             id = 1, // Replace with actual student ID
             name = name,
+            age=age,
+            testType = test,
             teacherName = teacherName,
             subject = subject,
-            desc = desc,
+
             image = imageUri.toString()
         )
 

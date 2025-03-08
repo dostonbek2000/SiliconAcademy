@@ -3,13 +3,12 @@ package com.example.siliconacademy.db
 import Group
 import Student
 import Teacher
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
@@ -32,12 +31,13 @@ import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
 import com.example.siliconacademy.utils.Content.PAYMENT_ID
 import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
-import com.example.siliconacademy.utils.Content.RESULT_DESCC
+import com.example.siliconacademy.utils.Content.RESULT_AGE
 import com.example.siliconacademy.utils.Content.RESULT_ID
 import com.example.siliconacademy.utils.Content.RESULT_IMAGE
 import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
 import com.example.siliconacademy.utils.Content.RESULT_S_NAME
 import com.example.siliconacademy.utils.Content.RESULT_TABLE
+import com.example.siliconacademy.utils.Content.RESULT_TYPE
 import com.example.siliconacademy.utils.Content.RESULT_T_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
@@ -111,14 +111,15 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         """.trimIndent()
 
         val resultQuery = """
-            CREATE TABLE $RESULT_TABLE ("
+            CREATE TABLE $RESULT_TABLE (
                 $RESULT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $RESULT_S_NAME TEXT NOT NULL,
+                $RESULT_AGE TEXT NOT NULL,
+                $RESULT_TYPE TEXT NOT NULL,
                 $RESULT_T_NAME TEXT NOT NULL,
                 $RESULT_SUBJECT TEXT NOT NULL,
-                $RESULT_DESCC TEXT NOT NULL,
                 $RESULT_IMAGE TEXT NOT NULL
-            ");
+            );
         """.trimIndent()
 
         db?.execSQL(courseQuery)
@@ -130,9 +131,13 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 3) {
+        if (oldVersion < 6) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $GROUP_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $TEACHERS_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $COURSE_TABLE")
             onCreate(db)
         }
     }
@@ -372,9 +377,10 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         val database = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(RESULT_S_NAME, result.name)
+        contentValues.put(RESULT_AGE,result.age)
+        contentValues.put(RESULT_TYPE,result.testType)
         contentValues.put(RESULT_T_NAME, result.teacherName)
         contentValues.put(RESULT_SUBJECT, result.subject)
-        contentValues.put(RESULT_DESCC, result.desc)
         contentValues.put(RESULT_IMAGE, result.image)
         contentValues.put(RESULT_ID, result.id)
         database.insert(RESULT_TABLE, null, contentValues)
@@ -383,6 +389,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun getAllResultsList(): ArrayList<Results> {
         val resultsList: ArrayList<Results> = ArrayList()
         val query: String = "select * from $RESULT_TABLE"
@@ -393,11 +400,14 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 val result = Results(
 
                     cursor.getInt(0),
+                    cursor.getInt(7),
                     cursor.getString(1),
                     cursor.getString(2),
                     cursor.getString(3),
                     cursor.getString(4),
-                    cursor.getString(5)
+                    cursor.getString(5),
+                    cursor.getString(6),
+
 
                 )
                     resultsList.add(result)

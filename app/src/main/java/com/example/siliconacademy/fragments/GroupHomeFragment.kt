@@ -33,7 +33,7 @@ class GroupHomeFragment : Fragment() {
         binding = FragmentGroupHomeBinding.inflate(layoutInflater, container, false)
         binding.toolBar.title = course.title
 
-        adapter = VpAdapter(childFragmentManager, lifecycle)
+        adapter = VpAdapter(childFragmentManager, lifecycle,2)
         binding.viewPager.adapter = adapter
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

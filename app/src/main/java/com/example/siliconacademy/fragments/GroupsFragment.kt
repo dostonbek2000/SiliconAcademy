@@ -24,13 +24,10 @@ private const val ARG_PARAM2 = "param2"
 class GroupsFragment : Fragment() {
 
     private val TAG = "GroupsFragment"
-
     private var param1: String? = null
     private var param2: String? = null
-
     private lateinit var binding: FragmentGroupsBinding
     private lateinit var codialDatabase: CodialDatabase
-
     private lateinit var groupsList: ArrayList<Group>
     private lateinit var groupList: ArrayList<Group>
     private lateinit var adapter: GroupRvAdapter
@@ -38,17 +35,13 @@ class GroupsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: ")
-
         codialDatabase =
             CodialDatabase(requireContext())
-
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

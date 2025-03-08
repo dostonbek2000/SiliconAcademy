@@ -65,4 +65,9 @@
         android:name="com.example.siliconacademy.fragments.CourseInfoFragment"
         android:label="fragment_course_info"
         tools:layout="@layout/fragment_course_info" />
+    <fragment
+        android:id="@+id/resultHomeFragment"
+        android:name="com.example.siliconacademy.fragments.ResultHomeFragment"
+        android:label="fragment_result_home"
+        tools:layout="@layout/fragment_result_home" />
 </navigation>
