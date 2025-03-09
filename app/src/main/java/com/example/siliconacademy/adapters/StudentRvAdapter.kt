@@ -62,10 +62,7 @@ class StudentRvAdapter(
                         onItemClick.onItemDeleteClick(student, position)
                         true
                     }
-                    R.id.pay -> {
-                        onItemClick.onItemPayClick(student, position)
-                        true
-                    }
+
                     R.id.attendance -> {
                         onItemClick.onItemAttendance(student, position)
                         true
@@ -99,7 +96,6 @@ class StudentRvAdapter(
         fun onItemClick(student: Student, position: Int)
         fun onItemEditClick(student: Student, position: Int)
         fun onItemDeleteClick(student: Student, position: Int)
-        fun onItemPayClick(student: Student, position: Int)
         fun onItemAttendance(student: Student, position: Int)
     }
 }

@@ -1,5 +1,7 @@
 package com.example.siliconacademy.models
 
+import android.net.Uri
+
 data class Results(
     val id: Int? = null,
     val resultPosition:Int?=null,
@@ -8,6 +10,5 @@ data class Results(
     val testType:String,
     val teacherName:String,
     val subject: String,
-    val image: String,
-    var resultId: Test? = null
+
 )

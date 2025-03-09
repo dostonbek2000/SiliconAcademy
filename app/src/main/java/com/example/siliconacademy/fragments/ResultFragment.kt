@@ -7,18 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
-import androidx.navigation.fragment.findNavController
-import com.example.siliconacademy.adapters.GroupRvAdapter
 import com.example.siliconacademy.db.CodialDatabase
-import com.example.siliconacademy.R
 import com.example.siliconacademy.adapters.ResultRvAdapter
-import com.example.siliconacademy.databinding.EditTeacherBinding
 import com.example.siliconacademy.databinding.FragmentGroupsBinding
+import com.example.siliconacademy.databinding.FragmentResultBinding
 import com.example.siliconacademy.models.Results
-import com.example.siliconacademy.utils.Object.courseId
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -30,7 +23,7 @@ class ResultFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var binding: FragmentGroupsBinding
+    private lateinit var binding: FragmentResultBinding
     private lateinit var codialDatabase: CodialDatabase
     private lateinit var adapter: ResultRvAdapter
     private lateinit var resultsList:ArrayList<Results>
@@ -50,39 +43,40 @@ class ResultFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentGroupsBinding.inflate(layoutInflater, container, false)
-        resultsList=codialDatabase.getAllResultsList()
-        resultList=ArrayList()
+        binding = FragmentResultBinding.inflate(layoutInflater, container, false)
+        resultsList = codialDatabase.getAllResultsList()
+        resultList = ArrayList()
+
         resultList.clear()
-        if (param1 == "0")
-            for (i in resultsList.indices) {
-                if (resultsList[i].resultPosition == 0) {
-                    resultList.add(resultsList[i])
-                }
-            }
-        else if (param1=="1") {
-            for (i in resultsList.indices) {
-                if (resultsList[i].resultPosition == 1) {
-                    resultList.add(resultsList[i])
-                }
-            }
-        }else
-            for (i in resultsList.indices){
-                if (resultsList[i].resultPosition==2){
-                    resultList.add(resultsList[i])
-                }
+        if (param1 == "0") {
+            resultList.addAll(resultsList.filter { it.resultPosition == 0 })
+        } else if (param1 == "1") {
+            resultList.addAll(resultsList.filter { it.resultPosition == 1 })
+        } else if (param1 == "2") {
+            resultList.addAll(resultsList.filter { it.resultPosition == 2 })
+        }
+
+        Log.d("ResultFragment", "Loaded results: ${resultList.size}")
+
+        adapter = ResultRvAdapter(resultList, object : ResultRvAdapter.OnItemClick {
+            override fun onItemClick(results: Results, position: Int) {
+                // Handle click if needed
             }
 
+            override fun onItemEditClick(results: Results, position: Int) {
+                // Handle edit if needed
+            }
 
+            override fun onItemDeleteClick(results: Results, position: Int) {
 
+            }
+        })
+
+        binding.recyclerView.adapter = adapter
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.recyclerView.adapter = adapter
-    }
 
     companion object {
         @JvmStatic

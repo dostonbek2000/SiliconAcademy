@@ -56,42 +56,43 @@
             android:id="@+id/age"/>
 
     </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
+    <LinearLayout
         android:id="@+id/test_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:background="@drawable/back"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/age_layout">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Test turi"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
+            <Spinner
+                android:id="@+id/type"
+
+                android:layout_width="match_parent"
+                android:layout_height="56dp" />
+
+
+
+
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/teacher_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:background="@drawable/back"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/test_layout">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <Spinner
             android:id="@+id/teacherName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Ustoz ismi"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:layout_height="56dp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/subject_layout"
         android:layout_width="match_parent"

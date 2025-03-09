@@ -33,7 +33,7 @@ import com.example.siliconacademy.utils.Content.PAYMENT_ID
 import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_AGE
 import com.example.siliconacademy.utils.Content.RESULT_ID
-import com.example.siliconacademy.utils.Content.RESULT_IMAGE
+import com.example.siliconacademy.utils.Content.RESULT_POSITION
 import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
 import com.example.siliconacademy.utils.Content.RESULT_S_NAME
 import com.example.siliconacademy.utils.Content.RESULT_TABLE
@@ -80,6 +80,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $GROUP_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $GROUP_POSITION INTEGER NOT NULL,
                 $GROUP_TITLE TEXT NOT NULL,
+                $GROUP_TEACHER_NAME TEXT NOT NULL,
                 $GROUP_TIME TEXT NOT NULL,
                 $GROUP_DAY TEXT NOT NULL,
                 $GROUP_TEACHER_ID INTEGER NOT NULL,
@@ -113,12 +114,13 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         val resultQuery = """
             CREATE TABLE $RESULT_TABLE (
                 $RESULT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $RESULT_POSITION INTEGER NOT NULL,
                 $RESULT_S_NAME TEXT NOT NULL,
                 $RESULT_AGE TEXT NOT NULL,
                 $RESULT_TYPE TEXT NOT NULL,
                 $RESULT_T_NAME TEXT NOT NULL,
-                $RESULT_SUBJECT TEXT NOT NULL,
-                $RESULT_IMAGE TEXT NOT NULL
+                $RESULT_SUBJECT TEXT NOT NULL
+                
             );
         """.trimIndent()
 
@@ -131,7 +133,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 6) {
+        if (oldVersion < 9) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
@@ -372,50 +374,63 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         database.insert(STUDENT_TABLE, null, contentValues)
         database.close()
     }
-
     override fun addResult(result: Results) {
         val database = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(RESULT_S_NAME, result.name)
-        contentValues.put(RESULT_AGE,result.age)
-        contentValues.put(RESULT_TYPE,result.testType)
-        contentValues.put(RESULT_T_NAME, result.teacherName)
-        contentValues.put(RESULT_SUBJECT, result.subject)
-        contentValues.put(RESULT_IMAGE, result.image)
-        contentValues.put(RESULT_ID, result.id)
+        val contentValues = ContentValues().apply {
+            put(RESULT_POSITION, result.resultPosition)
+            put(RESULT_S_NAME, result.name)
+            put(RESULT_AGE, result.age)
+            put(RESULT_TYPE, result.testType)
+            put(RESULT_T_NAME, result.teacherName)
+            put(RESULT_SUBJECT, result.subject)
+           put(RESULT_ID, result.id)
+        }
         database.insert(RESULT_TABLE, null, contentValues)
         database.close()
-
-
+        /* val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(STUDENT_ID, payment.studentId)
+            put(Content.PAYMENT_AMOUNT, payment.amount)
+            put(Content.PAYMENT_MONTH, payment.month)
+        }
+        db.insert(PAYMENT_TABLE, null, contentValues)
+        db.close()*/
     }
+   override fun getAllResultsList(): ArrayList<Results> {
+        val resultsList = ArrayList<Results>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $RESULT_TABLE", null)
 
-    @SuppressLint("SuspiciousIndentation")
-    override fun getAllResultsList(): ArrayList<Results> {
-        val resultsList: ArrayList<Results> = ArrayList()
-        val query: String = "select * from $RESULT_TABLE"
-        val database = this.readableDatabase
-        val cursor: Cursor = database.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(RESULT_ID))
+                val resultPosition = cursor.getInt(cursor.getColumnIndexOrThrow(RESULT_POSITION))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_S_NAME))
+                val age = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_AGE))
+                val testType = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_TYPE))
+                val teacherName = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_T_NAME))
+                val subject = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_SUBJECT))
+
                 val result = Results(
-
-                    cursor.getInt(0),
-                    cursor.getInt(7),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    cursor.getString(3),
-                    cursor.getString(4),
-                    cursor.getString(5),
-                    cursor.getString(6),
-
-
+                    id = id,
+                    resultPosition = resultPosition,
+                    name = name,
+                    age = age,
+                    testType = testType,
+                    teacherName = teacherName,
+                    subject = subject
                 )
-                    resultsList.add(result)
+
+                resultsList.add(result)
             } while (cursor.moveToNext())
         }
 
+        cursor.close()
+        db.close()
+
         return resultsList
     }
+
 
     override fun editStudent(student: Student): Int {
         val database = this.writableDatabase
@@ -569,7 +584,5 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 INSTANCE ?: CodialDatabase(context).also { INSTANCE = it }
             }
         }
-        }
     }
-
-
+}

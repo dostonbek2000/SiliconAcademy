@@ -11,18 +11,12 @@
         android:icon="@drawable/trash"
         android:title="O'chirish"
          />
-    <item
-        android:id="@+id/pay"
-        android:icon="@drawable/pen"
-        android:title="To'lov qilish"
-         />
+
     <item
         android:id="@+id/attendance"
         android:icon="@drawable/pen"
         android:title="Davomat olish"
          />
-    <item
-        android:id="@+id/result"
-       android:title="Natijalar"/>
+
 
 </menu>

@@ -34,6 +34,4 @@ interface DatabaseService {
     fun addResult(result: Results)
     fun getAllResultsList():ArrayList<Results>
 
-
-
 }
