@@ -5,7 +5,7 @@ import com.example.siliconacademy.models.Payment
 object Content {
 
     const val DB_NAME: String = "codial.db"
-    const val DB_VERSION: Int = 9
+    const val DB_VERSION: Int = 10
 
     const val COURSE_TABLE: String = "courses"
     const val COURSE_ID: String = "id"

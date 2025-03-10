@@ -52,31 +52,25 @@ class AddGroupFragment : Fragment() {
             )
 
         val daysList = arrayOf("Dushanba, Chorshanba, Juma", "Seshanba, Payshanba, Shanba")
-
-        binding.teacherName.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, teacherList)
-        binding.times.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, timesList)
         binding.days.adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, daysList)
 
+        binding.times.adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, timesList)
+
         binding.save.setOnClickListener {
             val groupTitle: String = binding.groupTitle.text.toString()
-            val groupTeacherName: String =
-                codialDatabase.getAllTeachersList()[binding.teacherName.selectedItemPosition].name!!
-            val groupTime: String = timesList[binding.times.selectedItemPosition]
+             val groupTime: String = timesList[binding.times.selectedItemPosition]
             val groupDay: String = daysList[binding.days.selectedItemPosition]
-            val groupTeacherId: Teacher =
-                codialDatabase.getAllTeachersList()[binding.teacherName.selectedItemPosition]
 
             codialDatabase.addGroup(
                 Group(
                     1,
                     groupTitle,
-                    groupTeacherName,
+
                     groupTime,
                     groupDay,
-                    groupTeacherId,
+
                     course
                 )
             )

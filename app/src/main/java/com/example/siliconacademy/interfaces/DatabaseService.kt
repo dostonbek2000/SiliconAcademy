@@ -31,7 +31,10 @@ interface DatabaseService {
     fun deleteStudent(student: Student)
     fun getStudentById(student: Student)
     fun getStudentByGroupId(group: Group)
+
     fun addResult(result: Results)
     fun getAllResultsList():ArrayList<Results>
+    fun editResult(results: Results):Int
+    fun deleteResult(results: Results)
 
 }

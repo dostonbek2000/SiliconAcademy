@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@id/teacherNameLayout"
+        app:layout_constraintBottom_toTopOf="@id/timesLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -28,23 +28,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
-        android:id="@+id/teacherNameLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/back"
-        app:layout_constraintBottom_toTopOf="@id/timesLayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/groupTitleLayout">
-
-        <Spinner
-            android:id="@+id/teacherName"
-            android:layout_width="match_parent"
-            android:layout_height="56dp" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/timesLayout"
@@ -55,7 +38,7 @@
         app:layout_constraintBottom_toTopOf="@id/daysLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/teacherNameLayout">
+        app:layout_constraintTop_toBottomOf="@id/groupTitleLayout">
 
         <Spinner
             android:id="@+id/times"

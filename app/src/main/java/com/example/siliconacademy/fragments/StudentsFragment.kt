@@ -120,11 +120,9 @@ class StudentsFragment : Fragment() {
                         studentsList.remove(student) // Remove from the list
                         adapter.notifyItemRemoved(position) // Notify the adapter
                         adapter.notifyDataSetChanged()
+
                         adapter.notifyItemRangeRemoved(position, studentList.size)
-                        adapter.notifyItemRangeChanged(
-                            position,
-                            studentList.size
-                        ) // Update positions
+
                         alertDialog.create().dismiss()
                     }
 
@@ -134,7 +132,7 @@ class StudentsFragment : Fragment() {
 
                     alertDialog.show()
                 }
-                override fun onItemPayClick(student: Student, position: Int) {
+                /*override fun onItemPayClick(student: Student, position: Int) {
                     val alertDialog = AlertDialog.Builder(requireContext()).create()
                     val paymentBinding = FragmentPaymentBinding.inflate(requireActivity().layoutInflater)
                     alertDialog.setView(paymentBinding.root)
@@ -188,7 +186,8 @@ class StudentsFragment : Fragment() {
                     }
 
                     alertDialog.show()
-                }
+                }*/
+
 
                 override fun onItemAttendance(student: Student, position: Int) {
                     TODO("Not yet implemented")

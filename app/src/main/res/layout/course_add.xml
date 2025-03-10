@@ -21,7 +21,7 @@
             android:id="@+id/courseTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Kurs nomi" />
+            android:hint="Ism-familya" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -39,7 +39,7 @@
             android:id="@+id/courseDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Kurs haqida" />
+            android:hint="Otasini Ismi" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

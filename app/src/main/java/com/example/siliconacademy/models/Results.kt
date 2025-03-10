@@ -2,14 +2,15 @@ package com.example.siliconacademy.models
 
 import Teacher
 import android.net.Uri
+import java.io.Serializable
 
 data class Results(
     val id: Int? = null,
-    val resultPosition:Int?=null,
-    val name: String,
-    val age:String,
-    val testType:String,
-    val teacherName:String,
-    val subject: String
+    var resultPosition:Int?=null,
+    var name: String,
+    var age:String,
+    var testType:String,
+    var teacherName:String,
+    var subject: String
 
-)
+) : Serializable

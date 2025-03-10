@@ -36,7 +36,7 @@
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="20dp"
 
-            android:src="@drawable/homework" />
+            android:src="@drawable/ustoz" />
 
         <TextView
             android:layout_width="match_parent"
@@ -44,7 +44,7 @@
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="Kurslar"
+            android:text="Oqituvchilar"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -97,7 +97,7 @@
             android:layout_gravity="center_horizontal|top"
             android:layout_marginTop="20dp"
 
-            android:src="@drawable/ustoz" />
+            android:src="@drawable/homework" />
 
         <TextView
             android:layout_width="match_parent"
@@ -105,7 +105,7 @@
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="O'qituvchilar"
+            android:text="Kurslar"
             android:textColor="@color/white"
             android:textSize="18sp" />
 

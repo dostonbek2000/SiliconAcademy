@@ -91,11 +91,7 @@ class GroupsFragment : Fragment() {
 
                 editTeacher.groupTitle.setText(group.groupTitle)
 
-                editTeacher.teacherName.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    teachersList
-                )
+
                 val timesList =
                     arrayOf(
                         "08:00 -> 10:00",
@@ -104,6 +100,10 @@ class GroupsFragment : Fragment() {
                         "16:00 -> 18:00",
                         "18:00 -> 20:00"
                     )
+                val daysList = arrayOf("Dushanba, Chorshanba, Juma", "Seshanba, Payshanba, Shanba")
+                editTeacher.days.adapter =
+                    ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, daysList)
+                val groupDay: String = daysList[editTeacher.days.selectedItemPosition]
 
                 editTeacher.times.adapter =
                     ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, timesList)
@@ -112,13 +112,11 @@ class GroupsFragment : Fragment() {
 
                 editTeacher.add.setOnClickListener {
                     val groupTitle: String = editTeacher.groupTitle.text.toString()
-                    val groupTeacherName: String =
-                        codialDatabase.getAllTeachersList()[editTeacher.teacherName.selectedItemPosition].name!!
-                    val groupTime: String = timesList[editTeacher.times.selectedItemPosition]
+                       val groupTime: String = timesList[editTeacher.times.selectedItemPosition]
 
                     group.groupTitle = groupTitle
-                    group.groupTeacherName = groupTeacherName
-                    group.groupTime = groupTime
+                     group.groupTime = groupTime
+                    group.groupDay=groupDay
                     codialDatabase.editGroup(group)
                     adapter.notifyItemChanged(groupList.size)
                     adapter.notifyItemRangeChanged(position, groupList.size)

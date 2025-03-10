@@ -25,7 +25,7 @@ class ResultRvAdapter(private var itemList:ArrayList<Results>,private val onItem
     }
     private fun showPopupMenu(view: View, results: Results, position: Int) {
         val popupMenu = PopupMenu(view.context, view)
-        popupMenu.menuInflater.inflate(R.menu.pop, popupMenu.menu)
+        popupMenu.menuInflater.inflate(R.menu.result, popupMenu.menu)
 
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {

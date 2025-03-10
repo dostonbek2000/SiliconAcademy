@@ -14,7 +14,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Barcha kurslar ro'yxati"
+        app:title="O'qituvchilar ro'yxati"
         app:titleTextColor="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
