@@ -1,6 +1,5 @@
 package com.example.siliconacademy.fragments
 
-import Teacher
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -12,32 +11,28 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.FragmentAddResultBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Results
+
 class AddResultFragment : Fragment() {
 
-    private lateinit var codialDatabase: CodialDatabase
     private lateinit var binding: FragmentAddResultBinding
     private lateinit var database: CodialDatabase
     private var imageUri: Uri? = null
+
     private val testList = arrayOf("DTM", "IELTS", "CEFR")
-    private lateinit var teachersList: ArrayList<Teacher>
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        codialDatabase = CodialDatabase(requireContext())
-        teachersList = codialDatabase.getAllTeachersList()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddResultBinding.inflate(inflater, container, false)
+        database = CodialDatabase.getInstance(requireContext())
 
-        // Initialize the database here
-        database = CodialDatabase.getInstance(requireContext()) // Ensure this method exists in CodialDatabase
+        // Set spinner adapter ONCE
+        binding.type.adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, testList)
 
         binding.imageButton.setOnClickListener {
             pickImageFromGallery()
@@ -65,61 +60,46 @@ class AddResultFragment : Fragment() {
         }
     }
 
-
     private fun saveResult() {
-          val teacherList = ArrayList<String>()
-        for (i in teachersList.indices) {
-            teacherList.add(teachersList[i].name!!)
-        binding.teacherName.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, teacherList)
-        binding.type.adapter=
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,testList)
+        val name = binding.name.text.toString().trim()
+        val subject = binding.subject.text.toString().trim()
+        val age = binding.age.text.toString().trim()
+        val teacherName = binding.teacherName.text.toString().trim()
+        val testType = binding.type.selectedItem?.toString() ?: ""
 
-
-        }
-
-        val name:String = binding.name.text.toString().trim()
-        val subject:String = binding.subject.text.toString().trim()
-        val age=binding.age.text.toString().trim()
-           val test:String=testList[binding.type.selectedItemPosition]
-        val teacherName:String = teacherList[binding.teacherName.selectedItemPosition]
-
-
-        if (name.isEmpty() || subject.isEmpty() || age.isEmpty()|| subject.isEmpty() ||test.isEmpty()|| teacherName.isEmpty() || imageUri == null || teacherName.isEmpty()) {
+        if (name.isEmpty() || subject.isEmpty() || age.isEmpty() || teacherName.isEmpty() || imageUri == null || testType.isEmpty()) {
             Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
             return
         }
-var position: Int? =null
-       when(test){
-           "DTM"->{
-               position=0
-           }
-           "IELTS"-> {
-               position = 1
-           }
-           "CEFR"->{
-               position=2
-           }
-       }
-        val result = Results(
 
+        val position = when (testType) {
+            "DTM" -> 0
+            "IELTS" -> 1
+            "CEFR" -> 2
+            else -> -1
+        }
+
+        if (position == -1) {
+            Toast.makeText(requireContext(), "Test turi noto‘g‘ri!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val result = Results(
             resultPosition = position,
             name = name,
-            age =age,
-            testType = test,
+            age = age,
+            testType = testType,
             teacherName = teacherName,
             subject = subject,
-
-
         )
 
         database.addResult(result)
+
         Toast.makeText(requireContext(), "Natija saqlandi!", Toast.LENGTH_SHORT).show()
-       findNavController().popBackStack()
+        findNavController().popBackStack()
     }
 
     companion object {
         private const val IMAGE_PICK_CODE = 1000
     }
 }
-

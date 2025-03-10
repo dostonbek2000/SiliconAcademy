@@ -57,42 +57,39 @@
 
     </com.google.android.material.textfield.TextInputLayout>
     <LinearLayout
-        android:id="@+id/test_layout"
+        android:id="@+id/test_Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:background="@drawable/back"
+        app:layout_constraintBottom_toTopOf="@id/teacher_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/age_layout">
 
-
-            <Spinner
-                android:id="@+id/type"
-
-                android:layout_width="match_parent"
-                android:layout_height="56dp" />
-
-
-
-
+        <Spinner
+            android:id="@+id/type"
+            android:layout_width="match_parent"
+            android:layout_height="56dp" />
     </LinearLayout>
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/teacher_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:background="@drawable/back"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/test_layout">
+        app:layout_constraintTop_toBottomOf="@id/test_Layout">
 
-        <Spinner
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/teacherName"
             android:layout_width="match_parent"
-            android:layout_height="56dp" />
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:hint="Ustoz Ism-familyasi"/>
 
-    </LinearLayout>
+    </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/subject_layout"
         android:layout_width="match_parent"

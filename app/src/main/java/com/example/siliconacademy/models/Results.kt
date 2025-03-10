@@ -1,5 +1,6 @@
 package com.example.siliconacademy.models
 
+import Teacher
 import android.net.Uri
 
 data class Results(
@@ -9,6 +10,6 @@ data class Results(
     val age:String,
     val testType:String,
     val teacherName:String,
-    val subject: String,
+    val subject: String
 
 )

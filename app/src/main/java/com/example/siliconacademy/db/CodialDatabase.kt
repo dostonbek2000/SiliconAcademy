@@ -37,6 +37,7 @@ import com.example.siliconacademy.utils.Content.RESULT_POSITION
 import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
 import com.example.siliconacademy.utils.Content.RESULT_S_NAME
 import com.example.siliconacademy.utils.Content.RESULT_TABLE
+import com.example.siliconacademy.utils.Content.RESULT_TEACHER_ID
 import com.example.siliconacademy.utils.Content.RESULT_TYPE
 import com.example.siliconacademy.utils.Content.RESULT_T_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
@@ -120,8 +121,10 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $RESULT_TYPE TEXT NOT NULL,
                 $RESULT_T_NAME TEXT NOT NULL,
                 $RESULT_SUBJECT TEXT NOT NULL
+                               
                 
             );
+            
         """.trimIndent()
 
         db?.execSQL(courseQuery)
@@ -384,17 +387,11 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             put(RESULT_T_NAME, result.teacherName)
             put(RESULT_SUBJECT, result.subject)
            put(RESULT_ID, result.id)
+
         }
         database.insert(RESULT_TABLE, null, contentValues)
         database.close()
-        /* val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(STUDENT_ID, payment.studentId)
-            put(Content.PAYMENT_AMOUNT, payment.amount)
-            put(Content.PAYMENT_MONTH, payment.month)
-        }
-        db.insert(PAYMENT_TABLE, null, contentValues)
-        db.close()*/
+
     }
    override fun getAllResultsList(): ArrayList<Results> {
         val resultsList = ArrayList<Results>()
@@ -418,7 +415,8 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                     age = age,
                     testType = testType,
                     teacherName = teacherName,
-                    subject = subject
+                    subject = subject,
+
                 )
 
                 resultsList.add(result)
