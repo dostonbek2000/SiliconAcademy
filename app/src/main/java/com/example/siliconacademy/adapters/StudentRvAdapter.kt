@@ -1,7 +1,9 @@
 package com.example.siliconacademy.adapters
 
+import Group
 import Student
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +16,9 @@ import com.example.siliconacademy.db.CodialDatabase
 class StudentRvAdapter(
     private val onItemClick: OnItemClick,
     private var itemList: ArrayList<Student>,
-    private val codialDatabase: CodialDatabase // ✅ Database passed as parameter
+    private val codialDatabase: CodialDatabase
+
+    // ✅ Database passed as parameter
 ) : RecyclerView.Adapter<StudentRvAdapter.StudentVh>() {
 
     inner class StudentVh(private val binding: StudentItemBinding) :
@@ -22,6 +26,9 @@ class StudentRvAdapter(
 
         @SuppressLint("SetTextI18n")
         fun onBind(student: Student, position: Int) {
+
+
+
             binding.studentFullName.text = "${student.name} ${student.surname}"
 
             // Fetch latest payment from DB

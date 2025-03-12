@@ -5,11 +5,10 @@ class Group {
     var id: Int? = null
     var groupPosition: Int? = null
     var groupTitle: String? = null
-    var groupTeacherName: String? = null
     var groupTime: String? = null
     var groupDay: String? = null
-    var teacherId: Teacher? = null
     var courseId: Course? = null
+
 
     constructor(
         id: Int?,

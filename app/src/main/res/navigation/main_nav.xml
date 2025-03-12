@@ -10,16 +10,8 @@
         android:name="com.example.siliconacademy.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
-    <fragment
-        android:id="@+id/coursesFragment"
-        android:name="com.example.siliconacademy.fragments.CoursesFragment"
-        android:label="fragment_courses"
-        tools:layout="@layout/fragment_courses" />
-    <fragment
-        android:id="@+id/teachersFragment"
-        android:name="com.example.siliconacademy.fragments.TeachersFragment"
-        android:label="fragment_teachers"
-        tools:layout="@layout/fragment_teachers" />
+
+
     <fragment
         android:id="@+id/groupHomeFragment"
         android:name="com.example.siliconacademy.fragments.GroupHomeFragment"
@@ -42,9 +34,9 @@
         tools:layout="@layout/fragment_add_student" />
     <fragment
         android:id="@+id/paymentFragment"
-        android:name="com.example.siliconacademy.fragments.PaymentFragment"
+        android:name="com.example.siliconacademy.fragments.AddPaymentFragment"
         android:label="fragment_payment"
-        tools:layout="@layout/fragment_payment" />
+        tools:layout="@layout/fragment_add_payment" />
     <fragment
         android:id="@+id/addResultFragment"
         android:name="com.example.siliconacademy.fragments.AddResultFragment"
@@ -60,11 +52,7 @@
         android:name="com.example.siliconacademy.fragments.ResultFragment"
         android:label="fragment_result"
         tools:layout="@layout/fragment_result" />
-    <fragment
-        android:id="@+id/courseInfoFragment"
-        android:name="com.example.siliconacademy.fragments.CourseInfoFragment"
-        android:label="fragment_course_info"
-        tools:layout="@layout/fragment_course_info" />
+
     <fragment
         android:id="@+id/resultHomeFragment"
         android:name="com.example.siliconacademy.fragments.ResultHomeFragment"
@@ -75,4 +63,12 @@
         android:name="com.example.siliconacademy.fragments.ResultInfoFragment"
         android:label="fragment_result_info"
         tools:layout="@layout/fragment_result_info" />
+    <fragment
+        android:id="@+id/teacherFragment"
+        android:name="com.example.siliconacademy.fragments.TeacherFragment"
+        android:label="TeacherFragment" />
+    <fragment
+        android:id="@+id/teacherInfoFragment"
+        android:name="com.example.siliconacademy.fragments.TeacherInfoFragment"
+        android:label="TeacherInfoFragment" />
 </navigation>

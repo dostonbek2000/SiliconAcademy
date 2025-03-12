@@ -25,26 +25,26 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
 
-        binding.courses.setOnClickListener {
+        binding.teacher.setOnClickListener {
             findNavController().navigate(
-                R.id.coursesFragment,
+                R.id.teacherFragment,
                 bundleOf("query" to 1)
             )
         }
 
         binding.groups.setOnClickListener {
             findNavController().navigate(
-                R.id.coursesFragment,
-                bundleOf("query" to 2)
+                R.id.teacherFragment,
+               bundleOf("query" to 2)
             )
         }
 
-        binding.teachers.setOnClickListener {
+       /* binding.teachers.setOnClickListener {
             findNavController().navigate(
-                R.id.coursesFragment,
+                R.id.teachersFragment,
                 bundleOf("query" to 3)
             )
-        }
+        }*/
         binding.results.setOnClickListener {
             findNavController().navigate(R.id.resultHomeFragment, bundleOf("query" to 4))
         }

@@ -1,6 +1,7 @@
 package com.example.siliconacademy.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -31,39 +32,43 @@ class GroupHomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGroupHomeBinding.inflate(layoutInflater, container, false)
-        binding.toolBar.title = course.title
 
-        adapter = VpAdapter(childFragmentManager, lifecycle,2)
-        binding.viewPager.adapter = adapter
+            binding.toolBar.title = course.title
 
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                if (position == 1) {
-                    binding.toolBar.inflateMenu(R.menu.add)
-                    binding.toolBar.setOnMenuItemClickListener {
-                        findNavController().navigate(
-                            R.id.addGroupFragment,
-                            bundleOf("course" to course)
-                        )
-                        true
+            adapter = VpAdapter(childFragmentManager, lifecycle, 2)
+            binding.viewPager.adapter = adapter
+
+            binding.viewPager.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    if (position == 1) {
+                        binding.toolBar.inflateMenu(R.menu.add)
+                        binding.toolBar.setOnMenuItemClickListener {
+                            findNavController().navigate(
+                                R.id.addGroupFragment,
+                                bundleOf("course" to course)
+                            )
+                            true
+                        }
+                    } else {
+                        binding.toolBar.menu.clear()
                     }
-                } else {
-                    binding.toolBar.menu.clear()
                 }
-            }
-        })
+            })
 
-        TabLayoutMediator(
-            binding.tabLayout, binding.viewPager
-        ) { tab, position -> // Styling each tab here
-            if (position == 0) {
-                tab.text = "Ochilgan guruhlar"
-            } else {
-                tab.text = "Ochilayotgan guruhlar"
-            }
-        }.attach()
+            TabLayoutMediator(
+                binding.tabLayout, binding.viewPager
+            ) { tab, position -> // Styling each tab here
+                if (position == 0) {
+                    tab.text = "Ochilgan guruhlar"
+                } else {
+                    tab.text = "Ochilayotgan guruhlar"
+                }
+            }.attach()
 
-        return binding.root
+
+       return binding.root
     }
+
 }

@@ -48,10 +48,7 @@ class GroupsFragment : Fragment() {
     ): View {
         binding = FragmentGroupsBinding.inflate(layoutInflater, container, false)
 
-        val teachersList: ArrayList<String> = ArrayList()
-        for (i in codialDatabase.getAllTeachersList().indices) {
-            teachersList.add(codialDatabase.getAllTeachersList()[i].name!!)
-        }
+
 
         groupsList = codialDatabase.getAllGroupsList()
         groupList = ArrayList()
@@ -149,7 +146,7 @@ class GroupsFragment : Fragment() {
 
                 alertDialog.show()
             }
-        }, groupList)
+        }, groupList,codialDatabase)
 
 
         return binding.root

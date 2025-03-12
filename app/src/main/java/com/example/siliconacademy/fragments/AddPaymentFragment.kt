@@ -9,12 +9,12 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.siliconacademy.databinding.FragmentPaymentBinding
+import com.example.siliconacademy.databinding.FragmentAddPaymentBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Payment
 
-class PaymentFragment : Fragment() {
-    private lateinit var binding: FragmentPaymentBinding
+class AddPaymentFragment : Fragment() {
+    private lateinit var binding: FragmentAddPaymentBinding
     private lateinit var codialDatabase: CodialDatabase
     private var studentId: Int? = null
     private var selectedMonth: String = ""
@@ -31,7 +31,7 @@ class PaymentFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPaymentBinding.inflate(inflater, container, false)
+        binding = FragmentAddPaymentBinding.inflate(inflater, container, false)
 
         // Populate the Spinner with months
         val months = listOf(

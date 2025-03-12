@@ -1,6 +1,5 @@
 package com.example.siliconacademy.models
 
-import Teacher
 import android.net.Uri
 import java.io.Serializable
 

@@ -1,7 +1,6 @@
 package com.example.siliconacademy.fragments
 
 import Group
-import Teacher
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -19,7 +18,6 @@ class AddGroupFragment : Fragment() {
     private lateinit var binding: FragmentAddGroupBinding
 
     private lateinit var codialDatabase: CodialDatabase
-    private lateinit var teachersList: ArrayList<Teacher>
 
     private lateinit var course: Course
 
@@ -27,7 +25,6 @@ class AddGroupFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         codialDatabase = CodialDatabase(requireContext())
-        teachersList = codialDatabase.getAllTeachersList()
         course = arguments?.getSerializable("course") as Course
     }
 
@@ -37,10 +34,7 @@ class AddGroupFragment : Fragment() {
     ): View {
         binding = FragmentAddGroupBinding.inflate(layoutInflater, container, false)
 
-        val teacherList = ArrayList<String>()
-        for (i in teachersList.indices) {
-            teacherList.add(teachersList[i].name!!)
-        }
+
 
         val timesList =
             arrayOf(

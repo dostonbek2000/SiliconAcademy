@@ -63,7 +63,7 @@ class StudentsFragment : Fragment() {
         }
 
         binding.groupTitle.text = groupTitle
-        binding.groupDesc.text = "O'quvchilar soni: ${studentList.size}"
+        binding.studentCount.text = "O'quvchilar soni: ${studentList.size}"
         binding.groupTime.text = groupTime
 
         adapter = StudentRvAdapter(

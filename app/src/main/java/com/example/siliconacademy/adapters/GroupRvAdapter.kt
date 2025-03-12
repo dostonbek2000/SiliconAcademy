@@ -1,13 +1,15 @@
 package com.example.siliconacademy.adapters
 
 import Group
+import Student
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.siliconacademy.databinding.GroupItemBinding
+import com.example.siliconacademy.db.CodialDatabase
 
-class GroupRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Group>) :
+class GroupRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Group>, private var codialDatabase: CodialDatabase) :
     RecyclerView.Adapter<GroupRvAdapter.GroupVh>() {
 
     inner class GroupVh(private val binding: GroupItemBinding) :
@@ -17,7 +19,10 @@ class GroupRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Group
             binding.root.setOnClickListener {
                 onItemClick.onItemClick(group, position)
             }
+
+
             binding.groupTitle.text = group.groupTitle
+
 
             binding.see.setOnClickListener {
                 onItemClick.onItemClick(group, position)
