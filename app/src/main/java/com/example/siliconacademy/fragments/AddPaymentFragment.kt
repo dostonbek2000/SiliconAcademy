@@ -32,8 +32,6 @@ class AddPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddPaymentBinding.inflate(inflater, container, false)
-
-        // Populate the Spinner with months
         val months = listOf(
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
             "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"

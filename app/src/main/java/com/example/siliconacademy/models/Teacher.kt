@@ -2,7 +2,7 @@ package com.example.siliconacademy.models
 
 import java.io.Serializable
 
-class Course : Serializable {
+class Teacher : Serializable {
 
     var id: Int? = null
     var title: String? = null

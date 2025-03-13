@@ -1,4 +1,4 @@
-import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Teacher
 
 class Group {
 
@@ -7,7 +7,7 @@ class Group {
     var groupTitle: String? = null
     var groupTime: String? = null
     var groupDay: String? = null
-    var courseId: Course? = null
+    var courseId: Teacher? = null
 
 
     constructor(
@@ -18,7 +18,7 @@ class Group {
         groupTime: String?,
         groupDay: String?,
 
-        courseId: Course
+        courseId: Teacher
     ) {
         this.id = id
         this.groupPosition = groupPosition
@@ -37,7 +37,7 @@ class Group {
         groupTime: String?,
         groupDay: String?,
 
-        courseId: Course
+        courseId: Teacher
     ) {
         this.groupPosition = groupPosition
         this.groupTitle = groupTitle

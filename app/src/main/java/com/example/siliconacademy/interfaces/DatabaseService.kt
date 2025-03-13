@@ -3,13 +3,21 @@ package com.example.siliconacademy.interfaces
 import Group
 import Student
 import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Teacher
 import com.example.siliconacademy.models.Results
 
 interface DatabaseService {
 
-    fun addTeacher(course: Course)
-    fun getAllTeachersList(): ArrayList<Course>
-    fun getTeacherById(id: Int): Course
+    fun addTeacher(teacher: Teacher)
+    fun getAllTeachersList(): ArrayList<Teacher>
+    fun getTeacherById(id: Int): Teacher
+    fun deleteTeacher(teacher: Teacher)
+    fun editTeacher(teacher: Teacher):Int
+
+    fun addCourse(course: Course)
+    fun getAllCourseList():ArrayList<Course>
+    fun deleteCourse(course: Course)
+    fun editCourse(course: Course):Int
 
 
     fun addGroup(group: Group)

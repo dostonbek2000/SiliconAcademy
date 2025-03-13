@@ -1,7 +1,6 @@
 package com.example.siliconacademy.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.siliconacademy.adapters.VpAdapter
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.FragmentGroupHomeBinding
-import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Teacher
 import com.google.android.material.tabs.TabLayoutMediator
 
 class GroupHomeFragment : Fragment() {
@@ -20,11 +19,11 @@ class GroupHomeFragment : Fragment() {
     private lateinit var binding: FragmentGroupHomeBinding
     private lateinit var adapter: VpAdapter
 
-    private lateinit var course: Course
+    private lateinit var course: Teacher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        course = arguments?.getSerializable("course") as Course
+        course = arguments?.getSerializable("course") as Teacher
     }
 
     override fun onCreateView(

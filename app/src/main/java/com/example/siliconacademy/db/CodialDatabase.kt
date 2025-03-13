@@ -11,7 +11,12 @@ import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
 import com.example.siliconacademy.models.Results
+import com.example.siliconacademy.models.Teacher
 import com.example.siliconacademy.utils.Content
+import com.example.siliconacademy.utils.Content.COURSE_DESCRIPTION
+import com.example.siliconacademy.utils.Content.COURSE_ID
+import com.example.siliconacademy.utils.Content.COURSE_TABLE
+import com.example.siliconacademy.utils.Content.COURSE_TITLE
 import com.example.siliconacademy.utils.Content.DB_NAME
 import com.example.siliconacademy.utils.Content.DB_VERSION
 import com.example.siliconacademy.utils.Content.GROUP_COURSE_ID
@@ -55,7 +60,6 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $TEACHERS_DESCRIPTION TEXT NOT NULL
             );
         """.trimIndent()
-
 
 
         val groupQuery = """
@@ -105,12 +109,24 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             );
             
         """.trimIndent()
+        val courseQuery =
+            """CREATE TABLE $COURSE_TABLE(
+$COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            $COURSE_TITLE TEXT NOT NULL,
+            $COURSE_DESCRIPTION TEXT NOT NULL 
+            
+            
+);
+
+""".trimIndent()
+
 
         db?.execSQL(teacherQuery)
         db?.execSQL(groupQuery)
         db?.execSQL(studentQuery)
         db?.execSQL(paymentQuery)
         db?.execSQL(resultQuery)
+        db?.execSQL(courseQuery)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -159,26 +175,26 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         db.close()
     }
 
-    override fun addTeacher(course: Course) {
+    override fun addTeacher(teacher: Teacher) {
         val database = this.writableDatabase
         val contentValues = ContentValues().apply {
-            put(TEACHERS_NAME, course.title)
-            put(TEACHERS_DESCRIPTION, course.desc)
+            put(TEACHERS_NAME, teacher.title)
+            put(TEACHERS_DESCRIPTION, teacher.desc)
         }
         database.insert(TEACHERS_TABLE, null, contentValues)
         database.close()
     }
 
-    override fun getAllTeachersList(): ArrayList<Course> {
-        val coursesList = ArrayList<Course>()
+    override fun getAllTeachersList(): ArrayList<Teacher> {
+        val teachersList = ArrayList<Teacher>()
         val query = "SELECT * FROM $TEACHERS_TABLE"
         val database = this.readableDatabase
         val cursor: Cursor = database.rawQuery(query, null)
 
         if (cursor.moveToFirst()) {
             do {
-                coursesList.add(
-                    Course(
+                teachersList.add(
+                    Teacher(
                         cursor.getInt(cursor.getColumnIndexOrThrow(TEACHERS_ID)),
                         cursor.getString(cursor.getColumnIndexOrThrow(TEACHERS_NAME)),
                         cursor.getString(cursor.getColumnIndexOrThrow(TEACHERS_DESCRIPTION))
@@ -187,14 +203,11 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             } while (cursor.moveToNext())
         }
         cursor.close()
-        return coursesList
+        return teachersList
     }
 
 
-
-
-
-    override fun getTeacherById(id: Int): Course {
+    override fun getTeacherById(id: Int): Teacher {
         val database = this.readableDatabase
         val cursor: Cursor = database.query(
             TEACHERS_TABLE,
@@ -206,9 +219,75 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             null
         )
         cursor.moveToFirst()
-        return Course(cursor.getInt(0), cursor.getString(1), cursor.getString(2))
+        return Teacher(cursor.getInt(0), cursor.getString(1), cursor.getString(2))
     }
 
+    override fun deleteTeacher(teacher: Teacher) {
+        val database = this.writableDatabase
+        database.delete(TEACHERS_TABLE, "$TEACHERS_ID=?", arrayOf("${teacher.id}"))
+        database.close()
+    }
+
+    override fun editTeacher(teacher: Teacher): Int {
+        val database = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put(TEACHERS_ID, teacher.id)
+        contentValues.put(TEACHERS_NAME, teacher.title)
+        contentValues.put(TEACHERS_DESCRIPTION, teacher.desc)
+
+        return database.update(
+            TEACHERS_TABLE, contentValues, "$TEACHERS_ID= ?", arrayOf("${teacher.id}")
+        )
+    }
+
+    override fun addCourse(course: Course) {
+        val database = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COURSE_TITLE, course.title)
+            put(COURSE_DESCRIPTION, course.courseDes)
+        }
+        database.insert(COURSE_TABLE, null, contentValues)
+        database.close()
+    }
+
+    override fun getAllCourseList(): ArrayList<Course> {
+        val coursesList = ArrayList<Course>()
+        val query = "SELECT * FROM $COURSE_TABLE"
+        val database = this.readableDatabase
+        val cursor: Cursor = database.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                coursesList.add(
+                    Course(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COURSE_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COURSE_TITLE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COURSE_DESCRIPTION))
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return coursesList
+    }
+
+    override fun deleteCourse(course: Course) {
+        val database = this.writableDatabase
+        database.delete(COURSE_TABLE, "$TEACHERS_ID=?", arrayOf("${course.courseId}"))
+        database.close()
+    }
+
+    override fun editCourse(course: Course): Int {
+        val database = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put(COURSE_ID, course.courseId)
+        contentValues.put(COURSE_TITLE, course.title)
+        contentValues.put(COURSE_DESCRIPTION, course.courseDes)
+
+        return database.update(
+            COURSE_TABLE, contentValues, "$COURSE_ID= ?", arrayOf("${course.courseId}")
+        )
+    }
 
 
     override fun addGroup(group: Group) {
@@ -339,10 +418,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         contentValues.put(RESULT_T_NAME, results.teacherName)
         contentValues.put(RESULT_SUBJECT, results.subject)
         return database.update(
-            RESULT_TABLE,
-            contentValues,
-            "$RESULT_ID=?",
-            arrayOf("${results.id}")
+            RESULT_TABLE, contentValues, "$RESULT_ID=?", arrayOf("${results.id}")
         )
 
 
@@ -371,7 +447,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
     }
 
     override fun deleteStudent(student: Student) {
-      //  getStudentById(student)
+        //  getStudentById(student)
         val database = this.writableDatabase
         database.delete(STUDENT_TABLE, "$STUDENT_ID= ?", arrayOf("${student.id}"))
         database.close()
@@ -427,12 +503,7 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         val database = this.readableDatabase
         val cursor: Cursor = database.query(
             GROUP_TABLE, arrayOf(
-                GROUP_ID,
-                GROUP_POSITION,
-                GROUP_TITLE,
-                GROUP_TIME,
-                GROUP_DAY,
-                GROUP_COURSE_ID
+                GROUP_ID, GROUP_POSITION, GROUP_TITLE, GROUP_TIME, GROUP_DAY, GROUP_COURSE_ID
             ), "$GROUP_ID = ?", arrayOf("$id"), null, null, null
         )
         cursor.moveToFirst()
@@ -445,7 +516,6 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             getTeacherById(cursor.getInt(5))
         )
     }
-
 
 
     override fun getStudentByGroupId(group: Group) {

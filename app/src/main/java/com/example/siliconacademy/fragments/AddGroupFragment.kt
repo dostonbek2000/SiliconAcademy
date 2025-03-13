@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.db.CodialDatabase
-import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Teacher
 import com.example.siliconacademy.databinding.FragmentAddGroupBinding
 
 class AddGroupFragment : Fragment() {
@@ -19,13 +19,13 @@ class AddGroupFragment : Fragment() {
 
     private lateinit var codialDatabase: CodialDatabase
 
-    private lateinit var course: Course
+    private lateinit var course: Teacher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         codialDatabase = CodialDatabase(requireContext())
-        course = arguments?.getSerializable("course") as Course
+        course = arguments?.getSerializable("course") as Teacher
     }
 
     override fun onCreateView(

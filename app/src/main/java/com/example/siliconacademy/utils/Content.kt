@@ -1,6 +1,5 @@
 package com.example.siliconacademy.utils
 
-import com.example.siliconacademy.models.Payment
 
 object Content {
 
@@ -12,13 +11,17 @@ object Content {
     const val TEACHERS_NAME: String = "name"
     const val TEACHERS_DESCRIPTION: String = "description"
 
+    const val COURSE_TABLE:String="course"
+     const val COURSE_ID:String="id"
+    const val COURSE_TITLE:String="title"
+    const val COURSE_DESCRIPTION:String="description"
+
     const val GROUP_TABLE: String = "groups"
     const val GROUP_ID: String = "id"
     const val GROUP_POSITION: String = "groupPosition"
     const val GROUP_TITLE: String = "title"
     const val GROUP_TIME: String = "time"
     const val GROUP_DAY: String = "day"
-    const val GROUP_TEACHER_ID: String = "teacherId"
     const val GROUP_COURSE_ID: String = "courseId"
 
     const val STUDENT_TABLE: String = "students"
@@ -42,6 +45,7 @@ object Content {
     const val RESULT_T_NAME:String="tname"
     const val RESULT_SUBJECT:String="subject"
     const val RESULT_POSITION:String="resultPosition"
-    const val RESULT_TEACHER_ID:String="teacher id"
+
+
 
 }
