@@ -52,19 +52,22 @@ class AddPaymentFragment : Fragment() {
 
         binding.save.setOnClickListener {
             val amountText = binding.paymentAmount.text.toString().trim()
+            val fullName:String=binding.name.text.toString().trim()
+
 
             if (amountText.isNotEmpty() && selectedMonth.isNotEmpty()) {
                 val amount = amountText.toDoubleOrNull()
                 if (amount != null) {
                     val payment = Payment(
                         id = 0, // Auto-increment
-                        studentId = studentId ?: return@setOnClickListener,
+                        fullName = fullName,
                         amount = amount.toString(),
                         month = selectedMonth
                     )
 
                     codialDatabase.addPayment(payment) // Save payment
                     adapter.notifyDataSetChanged()
+
                     Toast.makeText(requireContext(), "To'lov saqlandi!", Toast.LENGTH_SHORT).show()
                     findNavController().popBackStack()
                 } else {
@@ -79,3 +82,4 @@ class AddPaymentFragment : Fragment() {
         return binding.root
     }
 }
+

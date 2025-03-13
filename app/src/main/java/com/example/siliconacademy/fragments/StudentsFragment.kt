@@ -121,6 +121,7 @@ class StudentsFragment : Fragment() {
                         adapter.notifyItemRemoved(position) // Notify the adapter
                         adapter.notifyDataSetChanged()
 
+
                         adapter.notifyItemRangeRemoved(position, studentList.size)
 
                         alertDialog.create().dismiss()
@@ -132,7 +133,7 @@ class StudentsFragment : Fragment() {
 
                     alertDialog.show()
                 }
-                /*override fun onItemPayClick(student: Student, position: Int) {
+                /*fun onItemPayClick(student: Student, position: Int) {
                     val alertDialog = AlertDialog.Builder(requireContext()).create()
                     val paymentBinding = FragmentPaymentBinding.inflate(requireActivity().layoutInflater)
                     alertDialog.setView(paymentBinding.root)
@@ -209,7 +210,15 @@ class StudentsFragment : Fragment() {
 
             codialDatabase.editGroup(group)
         }
+        binding.recyclerView.adapter=adapter
 
  return binding.root
     }
+    override fun onResume() {
+        super.onResume()
+        studentsList.clear()
+        studentsList.addAll(codialDatabase.getAllStudentsList())
+        adapter.notifyDataSetChanged()
+    }
+
 }

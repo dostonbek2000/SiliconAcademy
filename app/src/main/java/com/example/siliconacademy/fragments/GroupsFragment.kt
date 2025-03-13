@@ -16,7 +16,7 @@ import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.EditTeacherBinding
 import com.example.siliconacademy.databinding.FragmentGroupsBinding
-import com.example.siliconacademy.utils.Object.courseId
+import com.example.siliconacademy.utils.Object.teacherId
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -55,13 +55,13 @@ class GroupsFragment : Fragment() {
         groupList.clear()
         if (param1 == "0")
             for (i in groupsList.indices) {
-                if (groupsList[i].groupPosition == 0 && groupsList[i].courseId?.id == courseId) {
+                if (groupsList[i].groupPosition == 0 && groupsList[i].courseId?.id == teacherId) {
                     groupList.add(groupsList[i])
                 }
             }
         else {
             for (i in groupsList.indices) {
-                if (groupsList[i].groupPosition == 1 && groupsList[i].courseId?.id == courseId) {
+                if (groupsList[i].groupPosition == 1 && groupsList[i].courseId?.id == teacherId) {
                     groupList.add(groupsList[i])
                 }
             }

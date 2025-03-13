@@ -26,7 +26,10 @@ import com.example.siliconacademy.utils.Content.GROUP_POSITION
 import com.example.siliconacademy.utils.Content.GROUP_TABLE
 import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
+import com.example.siliconacademy.utils.Content.PAYMENT_AMOUNT
+import com.example.siliconacademy.utils.Content.PAYMENT_FULL_NAME
 import com.example.siliconacademy.utils.Content.PAYMENT_ID
+import com.example.siliconacademy.utils.Content.PAYMENT_MONTH
 import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_AGE
 import com.example.siliconacademy.utils.Content.RESULT_ID
@@ -88,11 +91,11 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         val paymentQuery = """
             CREATE TABLE $PAYMENT_TABLE (
                 $PAYMENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $STUDENT_ID INTEGER NOT NULL,
-                ${Content.PAYMENT_AMOUNT} REAL NOT NULL,
-                ${Content.PAYMENT_MONTH} TEXT NOT NULL,
-                FOREIGN KEY ($STUDENT_ID) REFERENCES $STUDENT_TABLE($STUDENT_ID) ON DELETE CASCADE
-            );
+            
+                $PAYMENT_FULL_NAME TEXT NOT NULL,
+                $PAYMENT_AMOUNT REAL NOT NULL,
+                $PAYMENT_MONTH TEXT NOT NULL
+                  );
         """.trimIndent()
 
         val resultQuery = """
@@ -130,49 +133,70 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 12) {
+        if (oldVersion < 20) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $GROUP_TABLE")
-
             db?.execSQL("DROP TABLE IF EXISTS $TEACHERS_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $COURSE_TABLE")
             onCreate(db)
         }
     }
 
-    fun getPaymentsByStudentId(studentId: Int): List<Payment> {
-        val db = this.readableDatabase
-        val list = mutableListOf<Payment>()
-        val cursor = db.rawQuery(
-            "SELECT * FROM $PAYMENT_TABLE WHERE $STUDENT_ID = ?", arrayOf(studentId.toString())
-        )
 
-        while (cursor.moveToNext()) {
-            list.add(
-                Payment(
-                    id = cursor.getInt(cursor.getColumnIndexOrThrow(PAYMENT_ID)),
-                    studentId = cursor.getInt(cursor.getColumnIndexOrThrow(STUDENT_ID)),
-                    amount = cursor.getDouble(cursor.getColumnIndexOrThrow(Content.PAYMENT_AMOUNT))
-                        .toString(),
-                    month = cursor.getString(cursor.getColumnIndexOrThrow(Content.PAYMENT_MONTH))
-                )
-            )
-        }
-        cursor.close()
-        db.close()
-        return list
-    }
-
-    fun addPayment(payment: Payment) {
+    override fun addPayment(payment: Payment) {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
-            put(STUDENT_ID, payment.studentId)
-            put(Content.PAYMENT_AMOUNT, payment.amount)
-            put(Content.PAYMENT_MONTH, payment.month)
+            put(PAYMENT_FULL_NAME,payment.fullName)
+            put(PAYMENT_AMOUNT, payment.amount)
+            put(PAYMENT_MONTH, payment.month)
         }
         db.insert(PAYMENT_TABLE, null, contentValues)
         db.close()
+    }
+
+    override fun editPayment(payment: Payment): Int {
+        val database = this.writableDatabase
+        val contentValues = ContentValues()
+        contentValues.put(PAYMENT_ID, payment.id)
+        contentValues.put(PAYMENT_FULL_NAME, payment.fullName)
+        contentValues.put(PAYMENT_AMOUNT, payment.amount)
+        contentValues.put(PAYMENT_MONTH, payment.month)
+
+        return database.update(
+            PAYMENT_TABLE, contentValues, "$PAYMENT_ID= ?", arrayOf("${payment.id}")
+        )
+    }
+
+    override fun deletePayment(payment: Payment) {
+        val database = this.writableDatabase
+        database.delete(PAYMENT_TABLE, "$PAYMENT_ID=?", arrayOf("${payment.id}"))
+        database.close()
+    }
+
+    override fun getAllPaymentList(): ArrayList<Payment> {
+
+        val paymentList = ArrayList<Payment>()
+        val query = "SELECT * FROM $PAYMENT_TABLE"
+        val database = this.readableDatabase
+        val cursor: Cursor = database.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                paymentList.add(
+                    Payment(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(PAYMENT_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_FULL_NAME)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_AMOUNT)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_MONTH))
+
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return paymentList
     }
 
     override fun addTeacher(teacher: Teacher) {
@@ -244,7 +268,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val database = this.writableDatabase
         val contentValues = ContentValues().apply {
             put(COURSE_TITLE, course.title)
-            put(COURSE_DESCRIPTION, course.courseDes)
+            put(COURSE_DESCRIPTION, course.description)
         }
         database.insert(COURSE_TABLE, null, contentValues)
         database.close()
@@ -273,19 +297,19 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
 
     override fun deleteCourse(course: Course) {
         val database = this.writableDatabase
-        database.delete(COURSE_TABLE, "$TEACHERS_ID=?", arrayOf("${course.courseId}"))
+        database.delete(COURSE_TABLE, "$TEACHERS_ID=?", arrayOf("${course.id}"))
         database.close()
     }
 
     override fun editCourse(course: Course): Int {
         val database = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put(COURSE_ID, course.courseId)
+        contentValues.put(COURSE_ID, course.id)
         contentValues.put(COURSE_TITLE, course.title)
-        contentValues.put(COURSE_DESCRIPTION, course.courseDes)
+        contentValues.put(COURSE_DESCRIPTION, course.description)
 
         return database.update(
-            COURSE_TABLE, contentValues, "$COURSE_ID= ?", arrayOf("${course.courseId}")
+            COURSE_TABLE, contentValues, "$COURSE_ID= ?", arrayOf("${course.id}")
         )
     }
 

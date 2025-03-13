@@ -1,6 +1,8 @@
 package com.example.siliconacademy.models
 
 data class Payment(val id: Int? = null,
-                   val studentId: Int,
-                   val amount: String,
-                   val month: String)
+
+                   var fullName:String?=null,
+
+                   var amount: String,
+                   var month: String)

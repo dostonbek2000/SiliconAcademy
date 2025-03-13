@@ -39,14 +39,17 @@ class HomeFragment : Fragment() {
             )
         }
 
-       /* binding.teachers.setOnClickListener {
+        binding.course.setOnClickListener {
             findNavController().navigate(
-                R.id.teachersFragment,
+                R.id.courseFragment,
                 bundleOf("query" to 3)
             )
-        }*/
+        }
         binding.results.setOnClickListener {
             findNavController().navigate(R.id.resultHomeFragment, bundleOf("query" to 4))
+        }
+        binding.payment.setOnClickListener {
+            findNavController().navigate(R.id.paymentFragment, bundleOf("query" to 5))
         }
 
         return binding.root

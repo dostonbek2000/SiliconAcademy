@@ -32,11 +32,7 @@
         android:name="com.example.siliconacademy.fragments.AddStudentFragment"
         android:label="fragment_add_student"
         tools:layout="@layout/fragment_add_student" />
-    <fragment
-        android:id="@+id/paymentFragment"
-        android:name="com.example.siliconacademy.fragments.AddPaymentFragment"
-        android:label="fragment_payment"
-        tools:layout="@layout/fragment_add_payment" />
+
     <fragment
         android:id="@+id/addResultFragment"
         android:name="com.example.siliconacademy.fragments.AddResultFragment"
@@ -71,4 +67,25 @@
         android:id="@+id/teacherInfoFragment"
         android:name="com.example.siliconacademy.fragments.TeacherInfoFragment"
         android:label="TeacherInfoFragment" />
+    <fragment
+        android:id="@+id/courseFragment"
+        android:name="com.example.siliconacademy.fragments.CourseFragment"
+        android:label="fragment_course"
+        tools:layout="@layout/fragment_course" />
+    <fragment
+        android:id="@+id/courseInfoFragment"
+        android:name="com.example.siliconacademy.fragments.CourseInfoFragment"
+        android:label="fragment_course_info"
+        tools:layout="@layout/fragment_course_info" />
+    <fragment
+        android:id="@+id/paymentFragment"
+        android:name="com.example.siliconacademy.fragments.PaymentFragment"
+        android:label="fragment_payment"
+        tools:layout="@layout/fragment_payment" />
+    <fragment
+        android:id="@+id/addPaymentFragment"
+        android:name="com.example.siliconacademy.fragments.AddPaymentFragment"
+        android:label="fragment_add_payment"
+        tools:layout="@layout/fragment_add_payment" />
+
 </navigation>

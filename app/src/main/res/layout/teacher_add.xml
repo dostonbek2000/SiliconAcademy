@@ -8,56 +8,38 @@
     android:paddingBottom="10dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/nameLayout"
+        android:id="@+id/courseTitleLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/surnameLayout"
+        app:layout_constraintBottom_toTopOf="@id/courseDescLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/name"
+            android:id="@+id/courseTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ism" />
+            android:hint="Ism-familya" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/surnameLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/fatherNameLayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nameLayout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/surname"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Familya" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/fatherNameLayout"
+        android:id="@+id/courseDescLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/surnameLayout">
+        app:layout_constraintTop_toBottomOf="@id/courseTitleLayout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/fatherName"
+            android:id="@+id/courseDesc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Otasini ismi" />
+            android:hint="Otasini Ismi" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -83,7 +65,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/fatherNameLayout"
-        app:layout_constraintTop_toBottomOf="@id/fatherNameLayout" />
+        app:layout_constraintRight_toRightOf="@id/courseDescLayout"
+        app:layout_constraintTop_toBottomOf="@id/courseDescLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,27 +32,12 @@ class StudentRvAdapter(
             binding.studentFullName.text = "${student.name} ${student.surname}"
 
             // Fetch latest payment from DB
-            updatePaymentStatus(student)
 
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
             }
         }
-        fun updatePaymentStatus(student: Student) {
-            val payments = codialDatabase.getPaymentsByStudentId(student.id!!)
 
-            if (payments.isNotEmpty()) {
-                val latestPayment = payments.last()
-                student.latestPaymentAmount = latestPayment.amount// ✅ Update model
-                student.latestPaymentMonth = latestPayment.month
-
-                binding.paymentStatus.text = "Paid: ${latestPayment.amount} for ${latestPayment.month}"
-            } else {
-                student.latestPaymentAmount = null
-                student.latestPaymentMonth = null
-                binding.paymentStatus.text = "No Payment"
-            }
-        }
 
 
         private fun showPopupMenu(view: View, student: Student, position: Int) {
@@ -90,7 +75,6 @@ class StudentRvAdapter(
     override fun onBindViewHolder(holder: StudentVh, position: Int) {
         val student = itemList[position]
         holder.onBind(student, position)
-        holder.updatePaymentStatus(student)
 
 
     }

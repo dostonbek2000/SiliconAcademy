@@ -3,6 +3,7 @@ package com.example.siliconacademy.interfaces
 import Group
 import Student
 import com.example.siliconacademy.models.Course
+import com.example.siliconacademy.models.Payment
 import com.example.siliconacademy.models.Teacher
 import com.example.siliconacademy.models.Results
 
@@ -38,4 +39,8 @@ interface DatabaseService {
     fun editResult(results: Results):Int
     fun deleteResult(results: Results)
 
+    fun addPayment(payment: Payment)
+    fun editPayment(payment: Payment):Int
+    fun deletePayment(payment: Payment)
+    fun getAllPaymentList():ArrayList<Payment>
 }
