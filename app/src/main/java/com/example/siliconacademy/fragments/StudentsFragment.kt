@@ -58,7 +58,12 @@ class StudentsFragment : Fragment() {
         val studentList: ArrayList<Student> = ArrayList()
         for (i in 0 until studentsList.size) {
             if (studentsList[i].groupId?.id == groupId) {
-                studentList.add(studentsList[i])
+                val student = studentsList[i]
+
+                // Check payments for each student
+                val payments = codialDatabase.getPaymentsByStudentId(student.id!!)
+                student.paymentStatus = if (payments.isNotEmpty()) "To'lov qilingan" else "To'lov qilinmagan"
+                studentList.add(student)
             }
         }
 
@@ -103,7 +108,6 @@ class StudentsFragment : Fragment() {
                             addStudent.fatherName.error = "Required"
                         }
                     }
-
                     alertDialog.show()
                 }
 

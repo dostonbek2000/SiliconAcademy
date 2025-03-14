@@ -30,9 +30,7 @@ class StudentRvAdapter(
 
 
             binding.studentFullName.text = "${student.name} ${student.surname}"
-
-            // Fetch latest payment from DB
-
+            binding.paymentStatus.text = student.paymentStatus
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
             }

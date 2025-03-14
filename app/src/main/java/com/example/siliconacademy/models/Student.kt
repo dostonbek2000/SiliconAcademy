@@ -7,27 +7,25 @@ class Student {
     var surname: String? = null
     var fatherName: String? = null
     var groupId: Group? = null
-    var latestPaymentAmount: String? = null  // ✅ Stores latest payment amount
-    var latestPaymentMonth: String? = null // ✅ Stores latest payment month
+    var paymentStatus: String = "to'lov qilinmagan"
 
     constructor(
-        id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group,
-        latestPaymentAmount: String? = null, latestPaymentMonth: String? = null
+        id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group,paymentStatus:String
     ) {
         this.id = id
         this.name = name
         this.surname = surname
         this.fatherName = fatherName
         this.groupId = groupId
-        this.latestPaymentAmount = latestPaymentAmount
-        this.latestPaymentMonth = latestPaymentMonth
+       this.paymentStatus=paymentStatus
     }
 
-    constructor(name: String?, surname: String?, fatherName: String?, groupId: Group?) {
+    constructor(name: String?, surname: String?, fatherName: String?, groupId: Group?,status:String) {
         this.name = name
         this.surname = surname
         this.fatherName = fatherName
         this.groupId = groupId
+        this.paymentStatus=status
     }
 
     constructor()

@@ -32,54 +32,93 @@ class AddPaymentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddPaymentBinding.inflate(inflater, container, false)
+
+        // Month Spinner setup
         val months = listOf(
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
             "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
         )
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, months)
-        binding.monthSpinner.adapter = adapter
 
-        // Handle Spinner selection
+        val monthAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            months
+        )
+        binding.monthSpinner.adapter = monthAdapter
+
+        // Student full name list
+        val studentList = codialDatabase.getAllStudentsList()
+        val studentNames = ArrayList<String>()
+        for (student in studentList) {
+            val name = student.name ?: ""
+            val surname = student.surname ?: ""
+            studentNames.add("$name $surname".trim())
+        }
+
+        val nameAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            studentNames
+        )
+        binding.nameSpinner.adapter = nameAdapter
+
+        // Spinner month selection listener
         binding.monthSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+            ) {
                 selectedMonth = months[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                selectedMonth = "" // Default empty
+                selectedMonth = ""
             }
         }
 
+
         binding.save.setOnClickListener {
-            val amountText = binding.paymentAmount.text.toString().trim()
-            val fullName:String=binding.name.text.toString().trim()
+            val selectedStudentIndex = binding.nameSpinner.selectedItemPosition
 
+            if (selectedStudentIndex >= 0 && selectedStudentIndex < studentList.size) {
+                val selectedStudent = studentList[selectedStudentIndex]
+                val name = selectedStudent.name ?: ""
+                val surname = selectedStudent.surname ?: ""
+                val fullName = "$name $surname".trim()
 
-            if (amountText.isNotEmpty() && selectedMonth.isNotEmpty()) {
-                val amount = amountText.toDoubleOrNull()
-                if (amount != null) {
-                    val payment = Payment(
-                        id = 0, // Auto-increment
-                        fullName = fullName,
-                        amount = amount.toString(),
-                        month = selectedMonth
-                    )
+                val amountText = binding.paymentAmount.text.toString().trim()
 
-                    codialDatabase.addPayment(payment) // Save payment
-                    adapter.notifyDataSetChanged()
+                if (amountText.isNotEmpty() && selectedMonth.isNotEmpty()) {
+                    val amount = amountText.toDoubleOrNull()
+                    if (amount != null) {
+                        val payment = Payment(
+                            id = 0,
+                            fullName = fullName,
+                            amount = amount.toString(),
+                            month = selectedMonth
+                        )
 
-                    Toast.makeText(requireContext(), "To'lov saqlandi!", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                        codialDatabase.addPayment(payment)
+                        val student = selectedStudent
+                        student.paymentStatus = "To'lov qilingan"
+                        codialDatabase.editStudent(student)
+                        Toast.makeText(requireContext(), "To'lov saqlandi!", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                    } else {
+                        binding.paymentAmount.error = "To'g'ri miqdorni kiriting"
+                    }
                 } else {
-                    binding.paymentAmount.error = "Invalid amount"
+                    if (amountText.isEmpty()) {
+                        binding.paymentAmount.error = "To'lov miqdorini kiriting"
+                    }
+                    if (selectedMonth.isEmpty()) {
+                        Toast.makeText(requireContext(), "Iltimos, oy tanlang!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } else {
-                binding.paymentAmount.error = "Required"
-                Toast.makeText(requireContext(), "Iltimos, oy tanlang!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Iltimos, talabani tanlang!", Toast.LENGTH_SHORT).show()
             }
         }
 
         return binding.root
     }
 }
-

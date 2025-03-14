@@ -87,5 +87,10 @@
         android:name="com.example.siliconacademy.fragments.AddPaymentFragment"
         android:label="fragment_add_payment"
         tools:layout="@layout/fragment_add_payment" />
+    <fragment
+        android:id="@+id/paymentInfoFragment"
+        android:name="com.example.siliconacademy.fragments.PaymentInfoFragment"
+        android:label="fragment_payment_info"
+        tools:layout="@layout/fragment_payment_info" />
 
 </navigation>
