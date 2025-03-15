@@ -35,9 +35,9 @@ class AddStudentFragment : Fragment() {
             val name: String = binding.name.text.toString()
             val surname: String = binding.surname.text.toString()
             val fatherName: String = binding.fatherName.text.toString()
-            val status:String="to'lov qilinmagan"
 
-            codialDatabase.addStudent(Student(name, surname, fatherName, group,status))
+
+            codialDatabase.addStudent(Student(name, surname, fatherName, group,0.0))
             findNavController().popBackStack()
         }
 

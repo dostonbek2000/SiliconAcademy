@@ -30,7 +30,7 @@ class StudentRvAdapter(
 
 
             binding.studentFullName.text = "${student.name} ${student.surname}"
-            binding.paymentStatus.text = student.paymentStatus
+            binding.paymentStatus.text = student.accountBalance.toString()
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
             }

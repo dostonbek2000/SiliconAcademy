@@ -27,6 +27,7 @@ import com.example.siliconacademy.utils.Content.GROUP_TABLE
 import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
 import com.example.siliconacademy.utils.Content.PAYMENT_AMOUNT
+import com.example.siliconacademy.utils.Content.PAYMENT_DATE
 import com.example.siliconacademy.utils.Content.PAYMENT_FULL_NAME
 import com.example.siliconacademy.utils.Content.PAYMENT_ID
 import com.example.siliconacademy.utils.Content.PAYMENT_MONTH
@@ -39,11 +40,11 @@ import com.example.siliconacademy.utils.Content.RESULT_S_NAME
 import com.example.siliconacademy.utils.Content.RESULT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_TYPE
 import com.example.siliconacademy.utils.Content.RESULT_T_NAME
+import com.example.siliconacademy.utils.Content.STUDENT_ACCOUNT_BALANCE
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
 import com.example.siliconacademy.utils.Content.STUDENT_ID
 import com.example.siliconacademy.utils.Content.STUDENT_NAME
-import com.example.siliconacademy.utils.Content.STUDENT_PAYMENT_STATUS
 import com.example.siliconacademy.utils.Content.STUDENT_SURNAME
 import com.example.siliconacademy.utils.Content.STUDENT_TABLE
 import com.example.siliconacademy.utils.Content.TEACHERS_DESCRIPTION
@@ -80,7 +81,6 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                  FOREIGN KEY ($GROUP_COURSE_ID) REFERENCES $TEACHERS_TABLE($TEACHERS_ID) ON DELETE CASCADE
             );
         """.trimIndent()
-
         val studentQuery = """
             CREATE TABLE $STUDENT_TABLE (
                 $STUDENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,20 +88,20 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $STUDENT_SURNAME TEXT NOT NULL,
                 $STUDENT_FATHER_NAME TEXT NOT NULL,
                 $STUDENT_GROUP_ID INTEGER NOT NULL,
-                $STUDENT_PAYMENT_STATUS TEXT NOT NULL,
+                $STUDENT_ACCOUNT_BALANCE REAL NOT NULL,
                 FOREIGN KEY ($STUDENT_GROUP_ID) REFERENCES $GROUP_TABLE($GROUP_ID) ON DELETE CASCADE
             );
         """.trimIndent()
 
         val paymentQuery = """
-            CREATE TABLE $PAYMENT_TABLE (
-                $PAYMENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            
-                $PAYMENT_FULL_NAME TEXT NOT NULL,
-                $PAYMENT_AMOUNT REAL NOT NULL,
-                $PAYMENT_MONTH TEXT NOT NULL
-                  );
-        """.trimIndent()
+    CREATE TABLE $PAYMENT_TABLE (
+        $PAYMENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        $PAYMENT_FULL_NAME TEXT NOT NULL,
+        $PAYMENT_AMOUNT REAL NOT NULL,
+        $PAYMENT_MONTH TEXT NOT NULL,
+        payment_date TEXT NOT NULL      
+    );
+""".trimIndent()
 
         val resultQuery = """
             CREATE TABLE $RESULT_TABLE (
@@ -138,7 +138,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 25) {
+        if (oldVersion < 34) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
@@ -149,18 +149,69 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         }
     }
 
-
-    override fun addPayment(payment: Payment) {
-        val db = this.writableDatabase
-        val contentValues = ContentValues().apply {
-            put(PAYMENT_FULL_NAME,payment.fullName)
-            put(PAYMENT_AMOUNT, payment.amount)
-            put(PAYMENT_MONTH, payment.month)
-        }
-        db.insert(PAYMENT_TABLE, null, contentValues)
+    fun deductMonthlyFeeFromAllStudents() {
+        val db = writableDatabase
+        val deductionAmount = 200000.0
+        db.execSQL("UPDATE $STUDENT_TABLE SET $STUDENT_ACCOUNT_BALANCE = $STUDENT_ACCOUNT_BALANCE - ?", arrayOf(deductionAmount))
         db.close()
     }
-    fun getPaymentsByStudentId(studentId: Int): ArrayList<Payment> {
+
+    override fun addPayment(payment: Payment) {
+        val db = writableDatabase
+        val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Calendar.getInstance().time)
+        val cv = ContentValues().apply {
+            put(PAYMENT_FULL_NAME, payment.fullName)
+            put(PAYMENT_AMOUNT, payment.amount)
+            put(PAYMENT_MONTH, payment.month)
+            put(PAYMENT_DATE, date)
+        }
+        db.insert(PAYMENT_TABLE, null, cv)
+
+        val student = getAllStudentsList().find {
+            "${it.name} ${it.surname}".trim() == payment.fullName?.trim()
+        }
+        student?.let {
+            it.accountBalance = it.accountBalance?.plus(payment.amount.toDoubleOrNull() ?: 0.0)
+            editStudent(it)
+        }
+        db.close()
+    }
+
+    override fun editPayment(payment: Payment): Int {
+        val db = writableDatabase
+        val cv = ContentValues().apply {
+            put(PAYMENT_FULL_NAME, payment.fullName)
+            put(PAYMENT_AMOUNT, payment.amount)
+            put(PAYMENT_MONTH, payment.month)
+            put(PAYMENT_DATE, payment.date)
+        }
+        return db.update(PAYMENT_TABLE, cv, "$PAYMENT_ID=?", arrayOf("${payment.id}"))
+    }
+
+    override fun deletePayment(payment: Payment) {
+        writableDatabase.delete(PAYMENT_TABLE, "$PAYMENT_ID=?", arrayOf("${payment.id}"))
+    }
+
+    override fun getAllPaymentList(): ArrayList<Payment> {
+        val list = ArrayList<Payment>()
+        val cursor = readableDatabase.rawQuery("SELECT * FROM $PAYMENT_TABLE", null)
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(
+                    Payment(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getString(4)
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+ /*  fun getPaymentsByStudentId(studentId: Int): ArrayList<Payment> {
         val payments = ArrayList<Payment>()
         val database = this.readableDatabase
         val cursor = database.rawQuery("SELECT * FROM $PAYMENT_TABLE", null)
@@ -188,51 +239,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         }
         cursor.close()
         return payments
-    }
-
-
-    override fun editPayment(payment: Payment): Int {
-        val database = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(PAYMENT_ID, payment.id)
-        contentValues.put(PAYMENT_FULL_NAME, payment.fullName)
-        contentValues.put(PAYMENT_AMOUNT, payment.amount)
-        contentValues.put(PAYMENT_MONTH, payment.month)
-
-        return database.update(
-            PAYMENT_TABLE, contentValues, "$PAYMENT_ID= ?", arrayOf("${payment.id}")
-        )
-    }
-
-    override fun deletePayment(payment: Payment) {
-        val database = this.writableDatabase
-        database.delete(PAYMENT_TABLE, "$PAYMENT_ID=?", arrayOf("${payment.id}"))
-        database.close()
-    }
-
-    override fun getAllPaymentList(): ArrayList<Payment> {
-
-        val paymentList = ArrayList<Payment>()
-        val query = "SELECT * FROM $PAYMENT_TABLE"
-        val database = this.readableDatabase
-        val cursor: Cursor = database.rawQuery(query, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                paymentList.add(
-                    Payment(
-                        cursor.getInt(cursor.getColumnIndexOrThrow(PAYMENT_ID)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_FULL_NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_AMOUNT)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(PAYMENT_MONTH))
-
-                    )
-                )
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return paymentList
-    }
+    }*/
 
     override fun addTeacher(teacher: Teacher) {
         val database = this.writableDatabase
@@ -401,17 +408,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
 
-    override fun addStudent(student: Student) {
-        val database = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(STUDENT_NAME, student.name)
-        contentValues.put(STUDENT_SURNAME, student.surname)
-        contentValues.put(STUDENT_FATHER_NAME, student.fatherName)
-        contentValues.put(STUDENT_GROUP_ID, student.groupId?.id)
-        contentValues.put(STUDENT_PAYMENT_STATUS,student.paymentStatus)
-        database.insert(STUDENT_TABLE, null, contentValues)
-        database.close()
-    }
+
 
     override fun addResult(result: Results) {
         val database = this.writableDatabase
@@ -493,24 +490,18 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
 
-    override fun editStudent(student: Student): Int {
-        val database = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(STUDENT_ID, student.id)
-        contentValues.put(STUDENT_NAME, student.name)
-        contentValues.put(STUDENT_SURNAME, student.surname)
-        contentValues.put(STUDENT_FATHER_NAME, student.fatherName)
-        contentValues.put(STUDENT_GROUP_ID, student.groupId?.id)
-        return database.update(
-            STUDENT_TABLE, contentValues, "$STUDENT_ID = ?", arrayOf("${student.id}")
-        )
-    }
 
-    override fun deleteStudent(student: Student) {
-        //  getStudentById(student)
-        val database = this.writableDatabase
-        database.delete(STUDENT_TABLE, "$STUDENT_ID= ?", arrayOf("${student.id}"))
-        database.close()
+   override fun addStudent(student: Student) {
+        val db = writableDatabase
+        val cv = ContentValues().apply {
+            put(STUDENT_NAME, student.name)
+            put(STUDENT_SURNAME, student.surname)
+            put(STUDENT_FATHER_NAME, student.fatherName)
+            put(STUDENT_GROUP_ID, student.groupId?.id)
+            put(STUDENT_ACCOUNT_BALANCE, student.accountBalance)
+        }
+        db.insert(STUDENT_TABLE, null, cv)
+        db.close()
     }
 
     override fun getStudentById(student: Student) {
@@ -525,51 +516,59 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     cursor.getString(2),
                     cursor.getString(3),
                     getGroupById(cursor.getInt(4)),
-                    cursor.getString(5)
+                    cursor.getDouble(5)
                 )
                 deleteStudent(studentA)
             } while (cursor.moveToNext())
         }
     }
     // ✅ Utility Method to Update Student Payment Status — Exact match between payment month and current month
-    fun updateStudentPaymentStatus(student: Student) {
-        val payments = getPaymentsByStudentIdByFullName(student)
-        val currentMonth = getCurrentMonthInUzbek()
 
-        // ✅ Check if any payment's month exactly matches current month
-        val isPaidForCurrentMonth = payments.any { payment ->
-            payment.month.trim().equals(currentMonth.trim(), ignoreCase = true)
-        }
-
-        student.paymentStatus = if (isPaidForCurrentMonth) "Paid" else "Unpaid"
-        editStudent(student)
-    }
 
     // ✅ Modified getAllStudentsList() using updated logic
+    override fun editStudent(student: Student): Int {
+        val db = writableDatabase
+        val cv = ContentValues().apply {
+            put(STUDENT_NAME, student.name)
+            put(STUDENT_SURNAME, student.surname)
+            put(STUDENT_FATHER_NAME, student.fatherName)
+            put(STUDENT_GROUP_ID, student.groupId?.id)
+            put(STUDENT_ACCOUNT_BALANCE, student.accountBalance) // ✅ ADD THIS
+        }
+        return db.update(STUDENT_TABLE, cv, "$STUDENT_ID=?", arrayOf("${student.id}"))
+    }
+
+
+
     override fun getAllStudentsList(): ArrayList<Student> {
-        val studentsList: ArrayList<Student> = ArrayList()
-        val query: String = "SELECT * FROM $STUDENT_TABLE"
-        val database = this.readableDatabase
-        val cursor: Cursor = database.rawQuery(query, null)
+        val list = ArrayList<Student>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $STUDENT_TABLE", null)
         if (cursor.moveToFirst()) {
             do {
-                val student = Student(
-                    cursor.getInt(0),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    cursor.getString(3),
-                    getGroupById(cursor.getInt(4)),
-                    cursor.getString(5)
+                list.add(
+                    Student(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        getGroupById(cursor.getInt(4)),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(STUDENT_ACCOUNT_BALANCE))
+                    )
                 )
-                val payments = getPaymentsByStudentIdByFullName(student)
-                val currentMonth = getCurrentMonthInUzbek()
-                val isPaid = payments.any { it.month.trim().equals(currentMonth.trim(), ignoreCase = true) }
-                student.paymentStatus = if (isPaid) "Paid" else "Unpaid"
-                studentsList.add(student)
             } while (cursor.moveToNext())
         }
         cursor.close()
-        return studentsList
+        return list
+    }
+
+
+
+    override fun deleteStudent(student: Student) {
+        //  getStudentById(student)
+        val database = this.writableDatabase
+        database.delete(STUDENT_TABLE, "$STUDENT_ID= ?", arrayOf("${student.id}"))
+        database.close()
     }
 
     // ✅ Get payments for a student by matching full name
@@ -643,7 +642,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     cursor.getString(2),
                     cursor.getString(3),
                     getGroupById(cursor.getInt(4)),
-                    cursor.getString(5)
+                    cursor.getDouble(5)
                 )
                 deleteStudent(student)
             } while (cursor.moveToNext())

@@ -12,19 +12,18 @@ import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.databinding.FragmentAddPaymentBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Payment
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddPaymentFragment : Fragment() {
+
     private lateinit var binding: FragmentAddPaymentBinding
     private lateinit var codialDatabase: CodialDatabase
-    private var studentId: Int? = null
     private var selectedMonth: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            studentId = it.getInt("studentId")
-        }
-        codialDatabase = CodialDatabase(requireContext()) // Initialize Database
+        codialDatabase = CodialDatabase(requireContext())
     }
 
     override fun onCreateView(
@@ -33,40 +32,22 @@ class AddPaymentFragment : Fragment() {
     ): View {
         binding = FragmentAddPaymentBinding.inflate(inflater, container, false)
 
-        // Month Spinner setup
         val months = listOf(
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
             "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
         )
 
-        val monthAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            months
-        )
+        val monthAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, months)
         binding.monthSpinner.adapter = monthAdapter
 
-        // Student full name list
         val studentList = codialDatabase.getAllStudentsList()
-        val studentNames = ArrayList<String>()
-        for (student in studentList) {
-            val name = student.name ?: ""
-            val surname = student.surname ?: ""
-            studentNames.add("$name $surname".trim())
-        }
+        val studentNames = studentList.map { "${it.name} ${it.surname}".trim() }
 
-        val nameAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_list_item_1,
-            studentNames
-        )
+        val nameAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, studentNames)
         binding.nameSpinner.adapter = nameAdapter
 
-        // Spinner month selection listener
         binding.monthSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?, view: View?, position: Int, id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedMonth = months[position]
             }
 
@@ -75,47 +56,34 @@ class AddPaymentFragment : Fragment() {
             }
         }
 
-
         binding.save.setOnClickListener {
             val selectedStudentIndex = binding.nameSpinner.selectedItemPosition
+            val amountText = binding.paymentAmount.text.toString().trim()
 
-            if (selectedStudentIndex >= 0 && selectedStudentIndex < studentList.size) {
+            if (selectedStudentIndex in studentList.indices && amountText.isNotEmpty() && selectedMonth.isNotEmpty()) {
                 val selectedStudent = studentList[selectedStudentIndex]
-                val name = selectedStudent.name ?: ""
-                val surname = selectedStudent.surname ?: ""
-                val fullName = "$name $surname".trim()
+                val fullName = "${selectedStudent.name} ${selectedStudent.surname}".trim()
+                val amount = amountText.toDoubleOrNull()
 
-                val amountText = binding.paymentAmount.text.toString().trim()
-
-                if (amountText.isNotEmpty() && selectedMonth.isNotEmpty()) {
-                    val amount = amountText.toDoubleOrNull()
-                    if (amount != null) {
-                        val payment = Payment(
-                            id = 0,
-                            fullName = fullName,
-                            amount = amount.toString(),
-                            month = selectedMonth
-                        )
-
-                        codialDatabase.addPayment(payment)
-                        val student = selectedStudent
-                        student.paymentStatus = "To'lov qilingan"
-                        codialDatabase.editStudent(student)
-                        Toast.makeText(requireContext(), "To'lov saqlandi!", Toast.LENGTH_SHORT).show()
-                        findNavController().popBackStack()
-                    } else {
-                        binding.paymentAmount.error = "To'g'ri miqdorni kiriting"
-                    }
+                if (amount != null && amount > 0) {
+                    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+                    val payment = Payment(
+                        id = 0,
+                        fullName = fullName,
+                        amount = amount.toString(),
+                        month = selectedMonth,
+                        date = currentDate
+                    )
+                    codialDatabase.addPayment(payment)
+                    Toast.makeText(requireContext(), "Toʻlov muvaffaqiyatli qoʻshildi!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
                 } else {
-                    if (amountText.isEmpty()) {
-                        binding.paymentAmount.error = "To'lov miqdorini kiriting"
-                    }
-                    if (selectedMonth.isEmpty()) {
-                        Toast.makeText(requireContext(), "Iltimos, oy tanlang!", Toast.LENGTH_SHORT).show()
-                    }
+                    binding.paymentAmount.error = "Yaroqli miqdor kiriting"
                 }
             } else {
-                Toast.makeText(requireContext(), "Iltimos, talabani tanlang!", Toast.LENGTH_SHORT).show()
+                if (amountText.isEmpty()) binding.paymentAmount.error = "Toʻlov miqdorini kiriting"
+                if (selectedMonth.isEmpty()) Toast.makeText(requireContext(), "Oy tanlang", Toast.LENGTH_SHORT).show()
+                if (selectedStudentIndex !in studentList.indices) Toast.makeText(requireContext(), "Talabani tanlang", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -7,25 +7,25 @@ class Student {
     var surname: String? = null
     var fatherName: String? = null
     var groupId: Group? = null
-    var paymentStatus: String = "to'lov qilinmagan"
+    var accountBalance: Double? = 0.0
 
     constructor(
-        id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group,paymentStatus:String
+        id: Int?, name: String?, surname: String?, fatherName: String?, groupId: Group,accountBalance:Double
     ) {
         this.id = id
         this.name = name
         this.surname = surname
         this.fatherName = fatherName
         this.groupId = groupId
-       this.paymentStatus=paymentStatus
+        this.accountBalance=accountBalance
     }
 
-    constructor(name: String?, surname: String?, fatherName: String?, groupId: Group?,status:String) {
+    constructor(name: String?, surname: String?, fatherName: String?, groupId: Group?,accountBalance: Double) {
         this.name = name
         this.surname = surname
         this.fatherName = fatherName
         this.groupId = groupId
-        this.paymentStatus=status
+        this.accountBalance=accountBalance
     }
 
     constructor()
