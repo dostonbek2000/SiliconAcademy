@@ -54,6 +54,8 @@ class AddGroupFragment : Fragment() {
 
         binding.save.setOnClickListener {
             val groupTitle: String = binding.groupTitle.text.toString()
+            val subject:String=binding.groupSubject.text.toString()
+            val fee:String=binding.groupFee.text.toString()
              val groupTime: String = timesList[binding.times.selectedItemPosition]
             val groupDay: String = daysList[binding.days.selectedItemPosition]
 
@@ -61,11 +63,13 @@ class AddGroupFragment : Fragment() {
                 Group(
                     1,
                     groupTitle,
+                    subject,
 
                     groupTime,
                     groupDay,
 
-                    course
+                    course,
+                    fee
                 )
             )
             Toast.makeText(requireContext(), "Saqlandi", Toast.LENGTH_SHORT).show()

@@ -4,10 +4,12 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.siliconacademy.databinding.ActivityMainBinding
 import com.example.siliconacademy.fragments.DeductionAlarmReceiver
+import com.example.siliconacademy.fragments.MonthlyDeductionService
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,8 +20,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ✅ Schedule repeating alarm every minute
-        scheduleRepeatingDeductionCheck()
+      scheduleRepeatingDeductionCheck()
     }
 
     private fun scheduleRepeatingDeductionCheck() {
@@ -32,8 +33,10 @@ class MainActivity : AppCompatActivity() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val intervalMillis: Long = 60 * 1000 // Every 1 minute
-        val startTime = System.currentTimeMillis() + 5000 // Starts in 5 seconds
+
+        val intervalMillis: Long = 60 * 1000
+        val startTime = System.currentTimeMillis() + 5000
+
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             startTime,
@@ -41,4 +44,6 @@ class MainActivity : AppCompatActivity() {
             pendingIntent
         )
     }
+
+
 }

@@ -4,12 +4,14 @@ package com.example.siliconacademy.utils
 object Content {
 
     const val DB_NAME: String = "codial.db"
-    const val DB_VERSION: Int = 45
+    const val DB_VERSION: Int = 60
 
     const val TEACHERS_TABLE: String = "teachers"
     const val TEACHERS_ID: String = "id"
     const val TEACHERS_NAME: String = "name"
     const val TEACHERS_DESCRIPTION: String = "description"
+    const val TEACHER_AGE:String="age"
+    const val TEACHER_SUBJECT:String="fan"
 
     const val COURSE_TABLE:String="course"
      const val COURSE_ID:String="id"
@@ -23,14 +25,18 @@ object Content {
     const val GROUP_TIME: String = "time"
     const val GROUP_DAY: String = "day"
     const val GROUP_COURSE_ID: String = "courseId"
+    const val GROUP_SUBJECT:String="subject"
+    const val GROUP_FEE:String="fee"
 
     const val STUDENT_TABLE: String = "students"
     const val STUDENT_ID: String = "idd"
     const val STUDENT_NAME: String = "name"
     const val STUDENT_SURNAME: String = "surname"
+    const val STUDENT_AGE:String="age"
     const val STUDENT_FATHER_NAME: String = "fatherName"
     const val STUDENT_GROUP_ID: String = "groupId"
     const val STUDENT_ACCOUNT_BALANCE:String="status"
+    const val STUDENT_DATE:String="date"
 
     const val PAYMENT_TABLE:String="payment"
 
@@ -48,6 +54,8 @@ object Content {
     const val RESULT_T_NAME:String="tname"
     const val RESULT_SUBJECT:String="subject"
     const val RESULT_POSITION:String="resultPosition"
+
+
 
 
 

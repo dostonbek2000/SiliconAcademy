@@ -16,12 +16,11 @@
         app:layout_constraintBottom_toTopOf="@id/surnameLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1"
-        app:layout_constraintVertical_chainStyle="packed">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/name"
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Ism" />
@@ -34,16 +33,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@id/fatherNameLayout"
+        app:layout_constraintBottom_toTopOf="@id/ageLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameameLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/surname"
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Familya" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ageLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/fatherNameLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/surnameLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/age"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Yosh" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,13 +72,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/save"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/surnameLayout">
+        app:layout_constraintTop_toBottomOf="@id/ageLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/fatherName"
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Otasini ismi" />
@@ -70,11 +90,9 @@
         android:id="@+id/save"
         android:layout_width="120dp"
         android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_margin="20dp"
         app:cardBackgroundColor="@color/mainColor"
         app:cardCornerRadius="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fatherNameLayout">
 

@@ -7,7 +7,9 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import android.widget.Toast
+import androidx.core.graphics.PathUtils
 import com.example.siliconacademy.interfaces.DatabaseService
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
@@ -21,8 +23,10 @@ import com.example.siliconacademy.utils.Content.DB_NAME
 import com.example.siliconacademy.utils.Content.DB_VERSION
 import com.example.siliconacademy.utils.Content.GROUP_COURSE_ID
 import com.example.siliconacademy.utils.Content.GROUP_DAY
+import com.example.siliconacademy.utils.Content.GROUP_FEE
 import com.example.siliconacademy.utils.Content.GROUP_ID
 import com.example.siliconacademy.utils.Content.GROUP_POSITION
+import com.example.siliconacademy.utils.Content.GROUP_SUBJECT
 import com.example.siliconacademy.utils.Content.GROUP_TABLE
 import com.example.siliconacademy.utils.Content.GROUP_TIME
 import com.example.siliconacademy.utils.Content.GROUP_TITLE
@@ -41,6 +45,8 @@ import com.example.siliconacademy.utils.Content.RESULT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_TYPE
 import com.example.siliconacademy.utils.Content.RESULT_T_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_ACCOUNT_BALANCE
+import com.example.siliconacademy.utils.Content.STUDENT_AGE
+import com.example.siliconacademy.utils.Content.STUDENT_DATE
 import com.example.siliconacademy.utils.Content.STUDENT_FATHER_NAME
 import com.example.siliconacademy.utils.Content.STUDENT_GROUP_ID
 import com.example.siliconacademy.utils.Content.STUDENT_ID
@@ -51,6 +57,8 @@ import com.example.siliconacademy.utils.Content.TEACHERS_DESCRIPTION
 import com.example.siliconacademy.utils.Content.TEACHERS_ID
 import com.example.siliconacademy.utils.Content.TEACHERS_NAME
 import com.example.siliconacademy.utils.Content.TEACHERS_TABLE
+import com.example.siliconacademy.utils.Content.TEACHER_AGE
+import com.example.siliconacademy.utils.Content.TEACHER_SUBJECT
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -66,7 +74,9 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             CREATE TABLE $TEACHERS_TABLE (
                 $TEACHERS_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $TEACHERS_NAME TEXT NOT NULL,
-                $TEACHERS_DESCRIPTION TEXT NOT NULL
+                $TEACHERS_DESCRIPTION TEXT NOT NULL,
+                $TEACHER_AGE TEXT NOT NULL,
+                $TEACHER_SUBJECT TEXT NOT NULL
             );
         """.trimIndent()
 
@@ -76,9 +86,11 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $GROUP_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $GROUP_POSITION INTEGER NOT NULL,
                 $GROUP_TITLE TEXT NOT NULL,
+                $GROUP_SUBJECT TEXT NOT NULL,
                 $GROUP_TIME TEXT NOT NULL,
                 $GROUP_DAY TEXT NOT NULL,
                 $GROUP_COURSE_ID INTEGER NOT NULL,
+                $GROUP_FEE TEXT NOT NULL,
                  FOREIGN KEY ($GROUP_COURSE_ID) REFERENCES $TEACHERS_TABLE($TEACHERS_ID) ON DELETE CASCADE
             );
         """.trimIndent()
@@ -87,9 +99,15 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $STUDENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $STUDENT_NAME TEXT NOT NULL,
                 $STUDENT_SURNAME TEXT NOT NULL,
+                
                 $STUDENT_FATHER_NAME TEXT NOT NULL,
+                $STUDENT_AGE TEXT NOT NULL,
+                
                 $STUDENT_GROUP_ID INTEGER NOT NULL,
                 $STUDENT_ACCOUNT_BALANCE REAL NOT NULL,
+                $STUDENT_DATE TEXT NOT NULL,
+                removed_status TEXT DEFAULT 'not removed',
+                
                 FOREIGN KEY ($STUDENT_GROUP_ID) REFERENCES $GROUP_TABLE($GROUP_ID) ON DELETE CASCADE
             );
         """.trimIndent()
@@ -139,7 +157,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 45) {
+        if (oldVersion < 60) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
@@ -149,53 +167,55 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             onCreate(db)
         }
     }
+    fun deductMonthlyFeeForEachStudent(context: Context) {
+        val db = writableDatabase
+        val students = getAllStudentsList()
+        val cursor = db.rawQuery("SELECT $STUDENT_ID, removed_status FROM $STUDENT_TABLE", null)
 
-    fun deductMonthlyFeeAndLogPayment(context: Context) {
-        val prefs = context.getSharedPreferences("monthly_deduction_prefs", Context.MODE_PRIVATE)
-        val removedStatus = prefs.getString("removed_status", "not removed")
+        val deductionAmount = 200000.0
+        if (cursor.moveToFirst()) {
+            do {
+                val studentId = cursor.getInt(0)
+                val removedStatus = cursor.getString(1) ?: "not removed"
 
-        if (removedStatus == "not removed") {
-            val deductionAmount = 200000.0
-            val students = getAllStudentsList()
+                if (removedStatus == "not removed") {
+                    val student = students.find { it.id == studentId }
+                    student?.let {
+                        it.accountBalance = (it.accountBalance ?: 0.0) - deductionAmount
+                        val cv = ContentValues().apply {
+                            put(STUDENT_ACCOUNT_BALANCE, it.accountBalance)
+                            put("removed_status", "removed")
+                        }
+                        db.update(STUDENT_TABLE, cv, "$STUDENT_ID=?", arrayOf("$studentId"))
 
-            for (student in students) {
-                student.accountBalance = (student.accountBalance ?: 0.0) - deductionAmount
-                editStudent(student)
-            }
-
-            prefs.edit().putString("removed_status", "removed").apply()
-            Toast.makeText(context, "Har bir talabaning balansidan 200 000 so'm olib tashlandi", Toast.LENGTH_SHORT).show()
+                        Log.d("CODIAL_DB", "Deducted 200000 from ${it.name} ${it.surname}, new balance: ${it.accountBalance}")
+                    }
+                }
+            } while (cursor.moveToNext())
         }
+        cursor.close()
     }
-    fun resetRemovedStatusMonthly(context: Context) {
-        val prefs = context.getSharedPreferences("monthly_deduction_prefs", Context.MODE_PRIVATE)
+
+    fun resetAllStudentsRemovedStatus(context: Context) {
         val calendar = Calendar.getInstance()
         val todayDay = calendar.get(Calendar.DAY_OF_MONTH)
         if (todayDay == 1) {
-            prefs.edit().putString("removed_status", "not removed").apply()
+            val db = writableDatabase
+            val cv = ContentValues().apply { put("removed_status", "not removed") }
+            db.update(STUDENT_TABLE, cv, null, null)
+            Log.d("CODIAL_DB", "Reset removed_status for all students")
         }
     }
 
 
-    fun deductMonthlyFeeFromAllStudents() {
-        val db = writableDatabase
-        val deductionAmount = 200000.0
-        db.execSQL(
-            "UPDATE $STUDENT_TABLE SET $STUDENT_ACCOUNT_BALANCE = $STUDENT_ACCOUNT_BALANCE - ?",
-            arrayOf(deductionAmount)
-        )
-        db.close()
-    }
 
     override fun addPayment(payment: Payment) {
         val db = writableDatabase
-        val date =
-            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Calendar.getInstance().time)
         val cv = ContentValues().apply {
             put(PAYMENT_FULL_NAME, payment.fullName)
             put(PAYMENT_AMOUNT, payment.amount)
             put(PAYMENT_MONTH, payment.month)
-            put(PAYMENT_DATE, date)
+            put(PAYMENT_DATE, payment.date)
         }
         db.insert(PAYMENT_TABLE, null, cv)
 
@@ -278,6 +298,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val contentValues = ContentValues().apply {
             put(TEACHERS_NAME, teacher.title)
             put(TEACHERS_DESCRIPTION, teacher.desc)
+            put(TEACHER_AGE,teacher.age)
+            put(TEACHER_SUBJECT,teacher.subject)
         }
         database.insert(TEACHERS_TABLE, null, contentValues)
         database.close()
@@ -295,7 +317,10 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     Teacher(
                         cursor.getInt(cursor.getColumnIndexOrThrow(TEACHERS_ID)),
                         cursor.getString(cursor.getColumnIndexOrThrow(TEACHERS_NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(TEACHERS_DESCRIPTION))
+                        cursor.getString(cursor.getColumnIndexOrThrow(TEACHERS_DESCRIPTION)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(TEACHER_AGE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(TEACHER_SUBJECT))
+
                     )
                 )
             } while (cursor.moveToNext())
@@ -309,7 +334,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val database = this.readableDatabase
         val cursor: Cursor = database.query(
             TEACHERS_TABLE,
-            arrayOf(TEACHERS_ID, TEACHERS_NAME, TEACHERS_DESCRIPTION),
+            arrayOf(TEACHERS_ID, TEACHERS_NAME, TEACHERS_DESCRIPTION, TEACHER_AGE, TEACHER_SUBJECT),
             "$TEACHERS_ID = ?",
             arrayOf("$id"),
             null,
@@ -317,7 +342,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             null
         )
         cursor.moveToFirst()
-        return Teacher(cursor.getInt(0), cursor.getString(1), cursor.getString(2))
+        return Teacher(cursor.getInt(0), cursor.getString(1), cursor.getString(2),cursor.getString(3),cursor.getString(4))
     }
 
     override fun deleteTeacher(teacher: Teacher) {
@@ -332,6 +357,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         contentValues.put(TEACHERS_ID, teacher.id)
         contentValues.put(TEACHERS_NAME, teacher.title)
         contentValues.put(TEACHERS_DESCRIPTION, teacher.desc)
+        contentValues.put(TEACHER_AGE,teacher.age)
+        contentValues.put(TEACHER_SUBJECT,teacher.subject)
 
         return database.update(
             TEACHERS_TABLE, contentValues, "$TEACHERS_ID= ?", arrayOf("${teacher.id}")
@@ -393,9 +420,11 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val contentValues = ContentValues()
         contentValues.put(GROUP_POSITION, group.groupPosition)
         contentValues.put(GROUP_TITLE, group.groupTitle)
+        contentValues.put(GROUP_SUBJECT,group.groupSubject)
         contentValues.put(GROUP_TIME, group.groupTime)
         contentValues.put(GROUP_DAY, group.groupDay)
         contentValues.put(GROUP_COURSE_ID, group.courseId?.id)
+        contentValues.put(GROUP_FEE,group.fee)
         database.insert(GROUP_TABLE, null, contentValues)
         database.close()
     }
@@ -413,7 +442,9 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     cursor.getString(2),
                     cursor.getString(3),
                     cursor.getString(4),
-                    getTeacherById(cursor.getInt(5))
+                    cursor.getString(5),
+                    getTeacherById(cursor.getInt(6)),
+                    cursor.getString(7),
                 )
                 groupsList.add(group)
             } while (cursor.moveToNext())
@@ -433,9 +464,11 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         contentValues.put(GROUP_ID, group.id)
         contentValues.put(GROUP_POSITION, group.groupPosition)
         contentValues.put(GROUP_TITLE, group.groupTitle)
+        contentValues.put(GROUP_SUBJECT,group.groupSubject)
         contentValues.put(GROUP_TIME, group.groupTime)
         contentValues.put(GROUP_DAY, group.groupDay)
         contentValues.put(GROUP_COURSE_ID, group.courseId?.id)
+        contentValues.put(GROUP_FEE,group.fee)
         return database.update(GROUP_TABLE, contentValues, "$GROUP_ID = ?", arrayOf("${group.id}"))
     }
 
@@ -525,9 +558,12 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val cv = ContentValues().apply {
             put(STUDENT_NAME, student.name)
             put(STUDENT_SURNAME, student.surname)
+            put(STUDENT_AGE,student.age)
             put(STUDENT_FATHER_NAME, student.fatherName)
             put(STUDENT_GROUP_ID, student.groupId?.id)
+            put(STUDENT_DATE,student.date)
             put(STUDENT_ACCOUNT_BALANCE, student.accountBalance)
+
         }
         db.insert(STUDENT_TABLE, null, cv)
         db.close()
@@ -544,8 +580,12 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     cursor.getString(1),
                     cursor.getString(2),
                     cursor.getString(3),
-                    getGroupById(cursor.getInt(4)),
-                    cursor.getDouble(5)
+                    cursor.getString(4),
+                    getGroupById(cursor.getInt(5)),
+                    cursor.getString(6),
+                    cursor.getDouble(7)
+
+
                 )
                 deleteStudent(studentA)
             } while (cursor.moveToNext())
@@ -560,9 +600,12 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val cv = ContentValues().apply {
             put(STUDENT_NAME, student.name)
             put(STUDENT_SURNAME, student.surname)
+            put(STUDENT_AGE,student.age)
             put(STUDENT_FATHER_NAME, student.fatherName)
             put(STUDENT_GROUP_ID, student.groupId?.id)
+            put(STUDENT_DATE,student.date)
             put(STUDENT_ACCOUNT_BALANCE, student.accountBalance) // ✅ ADD THIS
+
         }
         return db.update(STUDENT_TABLE, cv, "$STUDENT_ID=?", arrayOf("${student.id}"))
     }
@@ -580,8 +623,11 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                         cursor.getString(1),
                         cursor.getString(2),
                         cursor.getString(3),
-                        getGroupById(cursor.getInt(4)),
-                        cursor.getDouble(cursor.getColumnIndexOrThrow(STUDENT_ACCOUNT_BALANCE))
+                        cursor.getString(4),
+                        getGroupById(cursor.getInt(5)),
+                        cursor.getString(7),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(STUDENT_ACCOUNT_BALANCE)),
+
                     )
                 )
             } while (cursor.moveToNext())
@@ -643,7 +689,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val database = this.readableDatabase
         val cursor: Cursor = database.query(
             GROUP_TABLE, arrayOf(
-                GROUP_ID, GROUP_POSITION, GROUP_TITLE, GROUP_TIME, GROUP_DAY, GROUP_COURSE_ID
+                GROUP_ID, GROUP_POSITION, GROUP_TITLE, GROUP_SUBJECT, GROUP_TIME, GROUP_DAY, GROUP_COURSE_ID,
+                GROUP_FEE
             ), "$GROUP_ID = ?", arrayOf("$id"), null, null, null
         )
         cursor.moveToFirst()
@@ -653,7 +700,9 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             cursor.getString(2),
             cursor.getString(3),
             cursor.getString(4),
-            getTeacherById(cursor.getInt(5))
+            cursor.getString(5),
+            getTeacherById(cursor.getInt(6)),
+                cursor.getString(7)
         )
     }
 
@@ -669,8 +718,11 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     cursor.getString(1),
                     cursor.getString(2),
                     cursor.getString(3),
-                    getGroupById(cursor.getInt(4)),
-                    cursor.getDouble(5)
+                    cursor.getString(4),
+                    getGroupById(cursor.getInt(5)),
+
+                    cursor.getString(7),
+                    cursor.getDouble(6)
                 )
                 deleteStudent(student)
             } while (cursor.moveToNext())

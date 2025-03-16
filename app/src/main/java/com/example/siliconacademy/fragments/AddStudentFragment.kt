@@ -10,6 +10,9 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.databinding.FragmentAddStudentBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class AddStudentFragment : Fragment() {
 
@@ -35,9 +38,10 @@ class AddStudentFragment : Fragment() {
             val name: String = binding.name.text.toString()
             val surname: String = binding.surname.text.toString()
             val fatherName: String = binding.fatherName.text.toString()
+val age:String=binding.age.text.toString()
+            val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-
-            codialDatabase.addStudent(Student(name, surname, fatherName, group,0.0))
+            codialDatabase.addStudent(Student(name=name, surname=surname, fatherName=fatherName,age=age , groupId = group, accountBalance = 0.0, date = currentDate))
             findNavController().popBackStack()
         }
 

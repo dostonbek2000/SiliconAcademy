@@ -92,5 +92,20 @@
         android:name="com.example.siliconacademy.fragments.PaymentInfoFragment"
         android:label="fragment_payment_info"
         tools:layout="@layout/fragment_payment_info" />
+    <fragment
+        android:id="@+id/addAttendanceFragment"
+        android:name="com.example.siliconacademy.fragments.AddAttendanceFragment"
+        android:label="fragment_add_attendance"
+        tools:layout="@layout/fragment_add_attendance" />
+    <fragment
+        android:id="@+id/attendanceFragment"
+        android:name="com.example.siliconacademy.fragments.AttendanceFragment"
+        android:label="fragment_attendance"
+        tools:layout="@layout/fragment_attendance" />
+    <fragment
+        android:id="@+id/attendanceInfoFragment"
+        android:name="com.example.siliconacademy.fragments.AttendanceInfoFragment"
+        android:label="fragment_attendance_info"
+        tools:layout="@layout/fragment_attendance_info" />
 
 </navigation>

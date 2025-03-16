@@ -31,6 +31,7 @@ class StudentRvAdapter(
 
             binding.studentFullName.text = "${student.name} ${student.surname}"
             binding.paymentStatus.text = student.accountBalance.toString()
+            binding.date.text=student.date.toString()
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
             }
@@ -53,10 +54,6 @@ class StudentRvAdapter(
                         true
                     }
 
-                    R.id.attendance -> {
-                        onItemClick.onItemAttendance(student, position)
-                        true
-                    }
                     else -> false
                 }
             }
@@ -85,6 +82,5 @@ class StudentRvAdapter(
         fun onItemClick(student: Student, position: Int)
         fun onItemEditClick(student: Student, position: Int)
         fun onItemDeleteClick(student: Student, position: Int)
-        fun onItemAttendance(student: Student, position: Int)
     }
 }

@@ -1,9 +1,3 @@
-// ✅ COMPLETE SYSTEM UPDATE: CodialDatabase.kt and All Fragments now fully migrated to STUDENT_ACCOUNT_BALANCE logic
-
-// --- CodialDatabase.kt ---
-// (Already Updated, No Changes Required)
-
-// --- StudentsFragment.kt ---
 package com.example.siliconacademy.fragments
 
 import Group
@@ -32,6 +26,9 @@ class StudentsFragment : Fragment() {
     private var groupId: Int? = null
     private var groupTitle: String? = null
     private var groupTime: String? = null
+    private var subject:String?=null
+    private var fee:String?=null
+    private var groupDay:String?=null
 
     private lateinit var codialDatabase: CodialDatabase
     private lateinit var adapter: StudentRvAdapter
@@ -45,6 +42,10 @@ class StudentsFragment : Fragment() {
         groupTitle = arguments?.getString("groupTitle")
         groupTime = arguments?.getString("groupTime")
         group = codialDatabase.getGroupById(groupId!!)
+        subject=arguments?.getString("subject")
+        fee=arguments?.getString("fee")
+        groupDay=arguments?.getString("groupDay")
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -67,9 +68,13 @@ class StudentsFragment : Fragment() {
             }
         }
 
-        binding.groupTitle.text = groupTitle
+        binding.groupTitle.text = "Guruh: $groupTitle"
         binding.studentCount.text = "O'quvchilar soni: ${studentList.size}"
-        binding.groupTime.text = groupTime
+        binding.groupTime.text = "Vaqti:$groupTime"
+        binding.days.text=groupDay
+        binding.subject.text="Fan: $subject"
+        binding.fee.text="To'lov: $fee so'm"
+
 
         adapter = StudentRvAdapter(
             object : StudentRvAdapter.OnItemClick {
@@ -121,7 +126,7 @@ class StudentsFragment : Fragment() {
                     alertDialog.show()
                 }
 
-                override fun onItemAttendance(student: Student, position: Int) {}
+
             },
             studentList,
             codialDatabase
@@ -144,7 +149,7 @@ class StudentsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        codialDatabase.deductMonthlyFeeAndLogPayment(requireContext())
+        codialDatabase.deductMonthlyFeeForEachStudent(requireContext())
 
         studentsList.clear()
         studentsList.addAll(codialDatabase.getAllStudentsList())

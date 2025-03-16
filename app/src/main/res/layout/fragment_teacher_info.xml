@@ -24,4 +24,26 @@
         android:textColor="@color/black"
         android:textSize="20dp"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/age"
+        app:layout_constraintTop_toBottomOf="@id/desc"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_margin="10dp"
+        android:text="Age "
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/subject"
+        app:layout_constraintTop_toBottomOf="@id/age"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_margin="10dp"
+        android:text="Subject "
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

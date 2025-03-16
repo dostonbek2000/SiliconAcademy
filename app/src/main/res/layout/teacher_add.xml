@@ -11,6 +11,7 @@
         android:id="@+id/courseTitleLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/courseDescLayout"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -19,6 +20,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/courseTitle"
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Ism-familya" />
@@ -30,16 +32,51 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/courseAgeLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/courseTitleLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/courseDesc"
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Otasini Ismi" />
+
+    </com.google.android.material.textfield.TextInputLayout><com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/courseAgeLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    app:layout_constraintBottom_toTopOf="@id/courseSubjectLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/courseDescLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/courseAge"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Yosh" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/courseSubjectLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/courseAgeLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/courseSubject"
+            android:layout_width="match_parent"
+            android:textAllCaps="false"
+            android:layout_height="wrap_content"
+            android:hint="Fan" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -65,7 +102,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/courseDescLayout"
-        app:layout_constraintTop_toBottomOf="@id/courseDescLayout" />
+        app:layout_constraintRight_toRightOf="@id/courseSubjectLayout"
+        app:layout_constraintTop_toBottomOf="@id/courseSubjectLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

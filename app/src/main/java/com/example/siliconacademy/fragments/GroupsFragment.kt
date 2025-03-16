@@ -74,7 +74,11 @@ class GroupsFragment : Fragment() {
                     bundleOf(
                         "groupId" to group.id,
                         "groupTitle" to group.groupTitle,
-                        "groupTime" to group.groupTime
+                        "groupTime" to group.groupTime,
+                        "subject" to group.groupSubject,
+                        "fee" to group.fee,
+                        "groupDay" to group.groupDay
+
                     )
                 )
             }
@@ -107,13 +111,16 @@ class GroupsFragment : Fragment() {
 
                 alertDialog.setView(editTeacher.root)
 
-                editTeacher.add.setOnClickListener {
+                editTeacher.save.setOnClickListener {
                     val groupTitle: String = editTeacher.groupTitle.text.toString()
                        val groupTime: String = timesList[editTeacher.times.selectedItemPosition]
-
+                    val subject:String=editTeacher.groupSubject.text.toString()
+                    val fee:String=editTeacher.groupFee.text.toString()
                     group.groupTitle = groupTitle
                      group.groupTime = groupTime
                     group.groupDay=groupDay
+                    group.groupSubject=subject
+                    group.fee=fee
                     codialDatabase.editGroup(group)
                     adapter.notifyItemChanged(groupList.size)
                     adapter.notifyItemRangeChanged(position, groupList.size)
@@ -121,9 +128,6 @@ class GroupsFragment : Fragment() {
                     alertDialog.dismiss()
                 }
 
-                editTeacher.close.setOnClickListener {
-                    alertDialog.dismiss()
-                }
 
                 alertDialog.show()
             }
