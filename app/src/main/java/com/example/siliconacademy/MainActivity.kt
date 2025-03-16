@@ -1,42 +1,44 @@
 package com.example.siliconacademy
 
-import android.app.Activity
-import android.graphics.Color
-import android.os.Build
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-
+import com.example.siliconacademy.databinding.ActivityMainBinding
+import com.example.siliconacademy.fragments.DeductionAlarmReceiver
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-//        windowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
-//        window.statusBarColor = Color.TRANSPARENT
-
-//        val w: Window = window
-//        w.setFlags(
-//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-//        )
-
+        // ✅ Schedule repeating alarm every minute
+        scheduleRepeatingDeductionCheck()
     }
 
-    private fun windowFlag(activity: Activity, bits: Int, on: Boolean) {
-        val win: Window = activity.window
-        val windowParams: WindowManager.LayoutParams = win.attributes
-        if (on) {
-            windowParams.flags or bits
-        } else {
-            windowParams.flags and bits.inv()
-        }
+    private fun scheduleRepeatingDeductionCheck() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        win.attributes = windowParams
+        val intent = Intent(this, DeductionAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            1002,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val intervalMillis: Long = 60 * 1000 // Every 1 minute
+        val startTime = System.currentTimeMillis() + 5000 // Starts in 5 seconds
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            startTime,
+            intervalMillis,
+            pendingIntent
+        )
     }
-
 }

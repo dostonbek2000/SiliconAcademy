@@ -10,6 +10,7 @@ import Group
 import Student
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.FragmentAddStudentBinding
 import com.example.siliconacademy.databinding.FragmentStudentsBinding
+import java.util.Calendar
 
 class StudentsFragment : Fragment() {
     private lateinit var binding: FragmentStudentsBinding
@@ -142,12 +144,18 @@ class StudentsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        codialDatabase.deductMonthlyFeeFromAllStudents()  // You can refine this to once per calendar month only
+        codialDatabase.deductMonthlyFeeAndLogPayment(requireContext())
 
         studentsList.clear()
         studentsList.addAll(codialDatabase.getAllStudentsList())
         adapter.notifyDataSetChanged()
     }
+    private fun getCurrentMonthInUzbek(): String {
+        val months = listOf(
+            "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
+            "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+        )
+        val calendar = Calendar.getInstance()
+        return months[calendar.get(Calendar.MONTH)]
+    }
 }
-
-// (AddPaymentFragment.kt, PaymentFragment.kt, PaymentInfoFragment.kt come next → reply "continue" to get them all updated fully.)
