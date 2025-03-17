@@ -55,10 +55,20 @@ class StudentsFragment : Fragment() {
     ): View {
         binding = FragmentStudentsBinding.inflate(layoutInflater, container, false)
         binding.toolBar.title = groupTitle
-        binding.toolBar.setOnMenuItemClickListener {
-            findNavController().navigate(R.id.addStudentFragment, bundleOf("groupId" to groupId))
-            true
+        binding.toolBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menu_add -> {
+                    findNavController().navigate(R.id.addStudentFragment, bundleOf("groupId" to groupId))
+                    true
+                }
+                R.id.menu_attendance -> {
+                    findNavController().navigate(R.id.attendanceFragment, bundleOf("groupId" to groupId))
+                    true
+                }
+                else -> false
+            }
         }
+
         studentsList = codialDatabase.getAllStudentsList()
 
         val studentList: ArrayList<Student> = ArrayList()

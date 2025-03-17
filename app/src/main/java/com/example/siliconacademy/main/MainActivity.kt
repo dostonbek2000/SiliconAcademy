@@ -1,15 +1,13 @@
-package com.example.siliconacademy
+package com.example.siliconacademy.main
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.siliconacademy.databinding.ActivityMainBinding
-import com.example.siliconacademy.fragments.DeductionAlarmReceiver
-import com.example.siliconacademy.fragments.MonthlyDeductionService
+import com.example.siliconacademy.deduction.DeductionAlarmReceiver
 
 class MainActivity : AppCompatActivity() {
 

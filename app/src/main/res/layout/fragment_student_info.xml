@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.StudentInfoFragment">
+<Toolbar
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:title="O'quvchi Malumotlari"
+    android:background="@color/mainColor"
+    android:id="@+id/toolBar"
+    android:pointerIcon="arrow"
+
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:id="@+id/studentInfoCard"
+
+            android:layout_marginBottom="16dp"
+            app:layout_constraintTop_toBottomOf="@id/toolBar"
+            app:layout_constraintBottom_toTopOf="@+id/back_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/studentFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="John Doe"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/mainColor" />
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:orientation="horizontal">
+    <TextView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Ota-ona: "
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/fatherName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="Smith"
+        android:textColor="@color/mainColor"
+        android:textSize="18sp" />
+</LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yoshi: "
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/studentAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="17"
+                android:textSize="18sp"
+                android:textColor="@color/mainColor"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Balans: "
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/accountBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="200000 so'm"
+                android:textSize="18sp"
+                android:textColor="@color/mainColor"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Group: "
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/groupName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Android Development"
+                android:textSize="18sp"
+                android:textColor="@color/mainColor"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Qo'shilgan san: "
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="4dp" />
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Android Development"
+                    android:textSize="18sp"
+                    android:textColor="@color/mainColor"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+    <!-- Edit Button -->
+    <Button
+        android:id="@+id/back_btn"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:text="Orqaga"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/mainColor"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="20dp"
+        android:padding="12dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

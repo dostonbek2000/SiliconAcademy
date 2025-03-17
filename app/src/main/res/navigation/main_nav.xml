@@ -99,9 +99,9 @@
         tools:layout="@layout/fragment_add_attendance" />
     <fragment
         android:id="@+id/attendanceFragment"
-        android:name="com.example.siliconacademy.fragments.AttendanceFragment"
+        android:name="com.example.siliconacademy.fragments.AttendanceHomeFragment"
         android:label="fragment_attendance"
-        tools:layout="@layout/fragment_attendance" />
+        tools:layout="@layout/fragment_attendance_home" />
     <fragment
         android:id="@+id/attendanceInfoFragment"
         android:name="com.example.siliconacademy.fragments.AttendanceInfoFragment"

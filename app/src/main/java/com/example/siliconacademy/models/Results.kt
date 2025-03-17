@@ -10,6 +10,7 @@ data class Results(
     var age:String,
     var testType:String,
     var teacherName:String,
-    var subject: String
+    var subject: String,
+    var imageUri: String? = null
 
 ) : Serializable

@@ -9,12 +9,22 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.graphics.PathUtils
 import com.example.siliconacademy.interfaces.DatabaseService
+import com.example.siliconacademy.models.AttendanceRecord
 import com.example.siliconacademy.models.Course
 import com.example.siliconacademy.models.Payment
 import com.example.siliconacademy.models.Results
 import com.example.siliconacademy.models.Teacher
+import com.example.siliconacademy.utils.Content.ATTENDANCE_GROUP_DATE
+import com.example.siliconacademy.utils.Content.ATTENDANCE_GROUP_ID
+import com.example.siliconacademy.utils.Content.ATTENDANCE_GROUP_TABLE
+import com.example.siliconacademy.utils.Content.ATTENDANCE_STUDENT_FULLNAME
+import com.example.siliconacademy.utils.Content.ATTENDANCE_STUDENT_GROUP_ID
+import com.example.siliconacademy.utils.Content.ATTENDANCE_STUDENT_ID
+import com.example.siliconacademy.utils.Content.ATTENDANCE_STUDENT_IS_PRESENT
+import com.example.siliconacademy.utils.Content.ATTENDANCE_STUDENT_TABLE
 import com.example.siliconacademy.utils.Content.COURSE_DESCRIPTION
 import com.example.siliconacademy.utils.Content.COURSE_ID
 import com.example.siliconacademy.utils.Content.COURSE_TABLE
@@ -130,7 +140,8 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $RESULT_AGE TEXT NOT NULL,
                 $RESULT_TYPE TEXT NOT NULL,
                 $RESULT_T_NAME TEXT NOT NULL,
-                $RESULT_SUBJECT TEXT NOT NULL
+                $RESULT_SUBJECT TEXT NOT NULL,
+                image_uri TEXT 
                                
                 
             );
@@ -146,6 +157,23 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
 );
 
 """.trimIndent()
+        val attendanceGroupTable = """
+    CREATE TABLE attendance_group (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        groupId INTEGER NOT NULL
+    );
+""".trimIndent()
+
+        val attendanceStudentTable = """
+    CREATE TABLE $ATTENDANCE_STUDENT_TABLE (
+        $ATTENDANCE_STUDENT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        $ATTENDANCE_STUDENT_GROUP_ID INTEGER NOT NULL,
+        $ATTENDANCE_STUDENT_FULLNAME TEXT NOT NULL,
+        $ATTENDANCE_STUDENT_IS_PRESENT INTEGER NOT NULL,
+        FOREIGN KEY($ATTENDANCE_STUDENT_GROUP_ID) REFERENCES $ATTENDANCE_GROUP_TABLE($ATTENDANCE_GROUP_ID)
+    );
+""".trimIndent()
 
 
         db?.execSQL(teacherQuery)
@@ -154,19 +182,104 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         db?.execSQL(paymentQuery)
         db?.execSQL(resultQuery)
         db?.execSQL(courseQuery)
+        db?.execSQL(attendanceGroupTable)
+        db?.execSQL(attendanceStudentTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 61) {
+        if (oldVersion < 69) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $GROUP_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $TEACHERS_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $COURSE_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $ATTENDANCE_GROUP_TABLE")
+            db?.execSQL("DROP TABLE IF EXISTS $ATTENDANCE_STUDENT_TABLE")
+
             onCreate(db)
         }
     }
+    fun getAllAttendanceGroupsByGroupId(groupId: Int): List<Pair<Int, String>> {
+        val list = ArrayList<Pair<Int, String>>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT id, date FROM attendance_group WHERE groupId = ?", arrayOf(groupId.toString()))
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(0)
+                val date = cursor.getString(1)
+                list.add(Pair(id, date))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+    fun addAttendanceGroupWithStudents(date: String, students: List<AttendanceRecord>, groupId: Int) {
+        val db = writableDatabase
+        val groupCV = ContentValues()
+        groupCV.put("date", date)
+        groupCV.put("groupId", groupId)
+        val attendanceGroupId = db.insert("attendance_group", null, groupCV)
+        for (student in students) {
+            val studentCV = ContentValues()
+            studentCV.put("groupId", attendanceGroupId)
+            studentCV.put("fullName", student.studentFullName)
+            studentCV.put("isPresent", if (student.isPresent) 1 else 0)
+            db.insert("attendance_student", null, studentCV)
+        }
+    }
+
+    fun getAllAttendanceGroups(): List<Pair<Int, String>> {
+        val list = ArrayList<Pair<Int, String>>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT id, date FROM attendance_group", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(0) // <- this ID must be attendance_group.id
+                val date = cursor.getString(1)
+                list.add(Pair(id, date))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+    fun printAllAttendanceStudentTable() {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM attendance_student", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(0)
+                val groupId = cursor.getInt(1)
+                val fullName = cursor.getString(2)
+                val isPresent = cursor.getInt(3)
+                Log.d("DB_CHECK", "ID=$id | GroupID=$groupId | Name=$fullName | Present=$isPresent")
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+    }
+
+    fun getAttendanceByGroupId(groupId: Int): List<AttendanceRecord> {
+        printAllAttendanceStudentTable()
+
+        val list = ArrayList<AttendanceRecord>()
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT fullName, isPresent FROM attendance_student WHERE groupId = ?",
+            arrayOf(groupId.toString())
+        )
+        if (cursor.moveToFirst()) {
+            do {
+                val name = cursor.getString(0)
+                val present = cursor.getInt(1) == 1
+                list.add(AttendanceRecord(name, present))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+
     fun deductMonthlyFeeForEachStudent(context: Context) {
         val db = writableDatabase
         val students = getAllStudentsList()
@@ -483,6 +596,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             put(RESULT_T_NAME, result.teacherName)
             put(RESULT_SUBJECT, result.subject)
             put(RESULT_ID, result.id)
+            put("image_uri", result.imageUri)
 
         }
         database.insert(RESULT_TABLE, null, contentValues)
@@ -504,6 +618,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 val testType = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_TYPE))
                 val teacherName = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_T_NAME))
                 val subject = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_SUBJECT))
+                val imageUri = cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))
 
                 val result = Results(
                     id = id,
@@ -513,6 +628,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     testType = testType,
                     teacherName = teacherName,
                     subject = subject,
+                    imageUri=imageUri
 
                     )
 

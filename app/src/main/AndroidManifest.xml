@@ -12,28 +12,39 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SiliconAcademy"
         tools:targetApi="31">
-        <receiver android:name=".fragments.DeductionAlarmReceiver" android:exported="true"
-            android:permission="TODO" />
-        <service
-            android:name=".fragments.MonthlyDeductionService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
 
-        <receiver android:name=".fragments.BootReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-
+        <!-- ✅ Make SplashActivity the launcher activity -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".main.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <activity
+            android:name=".main.MainActivity"
+            android:exported="true" />
+
+        <receiver
+            android:name=".deduction.DeductionAlarmReceiver"
+            android:exported="true"
+            android:permission="TODO" />
+
+        <service
+            android:name=".deduction.MonthlyDeductionService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <receiver
+            android:name=".deduction.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
 </manifest>

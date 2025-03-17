@@ -30,7 +30,6 @@ class AddResultFragment : Fragment() {
         binding = FragmentAddResultBinding.inflate(inflater, container, false)
         database = CodialDatabase.getInstance(requireContext())
 
-        // Set spinner adapter ONCE
         binding.type.adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, testList)
 
@@ -91,6 +90,7 @@ class AddResultFragment : Fragment() {
             testType = testType,
             teacherName = teacherName,
             subject = subject,
+            imageUri = imageUri.toString() // Store image URI
         )
 
         database.addResult(result)
