@@ -157,7 +157,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 60) {
+        if (oldVersion < 61) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
@@ -558,8 +558,9 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val cv = ContentValues().apply {
             put(STUDENT_NAME, student.name)
             put(STUDENT_SURNAME, student.surname)
-            put(STUDENT_AGE,student.age)
+
             put(STUDENT_FATHER_NAME, student.fatherName)
+            put(STUDENT_AGE,student.age)
             put(STUDENT_GROUP_ID, student.groupId?.id)
             put(STUDENT_DATE,student.date)
             put(STUDENT_ACCOUNT_BALANCE, student.accountBalance)
@@ -600,8 +601,9 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         val cv = ContentValues().apply {
             put(STUDENT_NAME, student.name)
             put(STUDENT_SURNAME, student.surname)
-            put(STUDENT_AGE,student.age)
+
             put(STUDENT_FATHER_NAME, student.fatherName)
+            put(STUDENT_AGE,student.age)
             put(STUDENT_GROUP_ID, student.groupId?.id)
             put(STUDENT_DATE,student.date)
             put(STUDENT_ACCOUNT_BALANCE, student.accountBalance) // ✅ ADD THIS

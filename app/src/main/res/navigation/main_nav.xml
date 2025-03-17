@@ -107,5 +107,10 @@
         android:name="com.example.siliconacademy.fragments.AttendanceInfoFragment"
         android:label="fragment_attendance_info"
         tools:layout="@layout/fragment_attendance_info" />
+    <fragment
+        android:id="@+id/studentInfoFragment"
+        android:name="com.example.siliconacademy.fragments.StudentInfoFragment"
+        android:label="fragment_student_info"
+        tools:layout="@layout/fragment_student_info" />
 
 </navigation>

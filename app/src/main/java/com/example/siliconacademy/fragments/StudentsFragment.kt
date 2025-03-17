@@ -78,7 +78,10 @@ class StudentsFragment : Fragment() {
 
         adapter = StudentRvAdapter(
             object : StudentRvAdapter.OnItemClick {
-                override fun onItemClick(student: Student, position: Int) {}
+                override fun onItemClick(student: Student, position: Int) {
+
+                    findNavController().navigate(R.id.studentInfoFragment, bundleOf("studentDetails" to student))
+                }
 
                 override fun onItemEditClick(student: Student, position: Int) {
                     val alertDialog = AlertDialog.Builder(requireContext()).create()

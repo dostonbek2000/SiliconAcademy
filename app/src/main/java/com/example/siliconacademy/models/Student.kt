@@ -1,6 +1,7 @@
 import Group
+import java.io.Serializable
 
-class Student {
+class Student:Serializable {
 
     var id: Int? = null
     var name: String? = null
@@ -21,7 +22,7 @@ class Student {
         this.surname = surname
         this.fatherName = fatherName
 
-        this.fatherName=age
+        this.age=age
         this.groupId = groupId
         this.date=date
         this.accountBalance=accountBalance

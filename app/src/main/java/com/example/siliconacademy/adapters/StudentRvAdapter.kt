@@ -32,6 +32,9 @@ class StudentRvAdapter(
             binding.studentFullName.text = "${student.name} ${student.surname}"
             binding.paymentStatus.text = student.accountBalance.toString()
             binding.date.text=student.date.toString()
+            binding.root.setOnClickListener {
+                onItemClick.onItemClick(student, position)
+            }
             binding.moreOptions.setOnClickListener { view ->
                 showPopupMenu(view, student, position)
             }
@@ -45,6 +48,7 @@ class StudentRvAdapter(
 
             popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
+
                     R.id.edit -> {
                         onItemClick.onItemEditClick(student, position)
                         true
