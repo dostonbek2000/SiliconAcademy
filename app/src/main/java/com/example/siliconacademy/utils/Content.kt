@@ -4,7 +4,7 @@ package com.example.siliconacademy.utils
 object Content {
 
     const val DB_NAME: String = "codial.db"
-    const val DB_VERSION: Int = 70
+    const val DB_VERSION: Int = 71
 
     const val TEACHERS_TABLE: String = "teachers"
     const val TEACHERS_ID: String = "id"

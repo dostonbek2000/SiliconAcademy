@@ -7,9 +7,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.siliconacademy.databinding.GroupItemBinding
-import com.example.siliconacademy.db.CodialDatabase
 
-class GroupRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Group>, private var codialDatabase: CodialDatabase) :
+class GroupRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Group>) :
     RecyclerView.Adapter<GroupRvAdapter.GroupVh>() {
 
     inner class GroupVh(private val binding: GroupItemBinding) :

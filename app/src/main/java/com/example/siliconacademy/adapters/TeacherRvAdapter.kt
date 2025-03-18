@@ -22,6 +22,7 @@ class TeacherRvAdapter(var onItemClick: OnItemClick, var itemList: ArrayList<Tea
                 showPopupMenu(view,teacher, position)
             }
             binding.courseTitle.text = teacher.title
+            binding.TeacherSubject.text=teacher.subject
         }
         private fun showPopupMenu(view: View, teacher: Teacher, position: Int) {
             val popupMenu = PopupMenu(view.context, view)

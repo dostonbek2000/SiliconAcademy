@@ -37,7 +37,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/groupTitleLayout"
-        app:layout_constraintVertical_bias="0.1"
         app:layout_constraintVertical_chainStyle="packed">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -57,51 +56,52 @@
         app:layout_constraintBottom_toTopOf="@id/timesLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintVertical_bias="0.1"
         app:layout_constraintVertical_chainStyle="packed">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/groupFee"
             android:layout_width="match_parent"
+            android:inputType="number"
             android:layout_height="wrap_content"
             android:hint="Oylik to'lov" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/timesLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/back"
         app:layout_constraintBottom_toTopOf="@id/daysLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/groupFeeLayout">
 
-        <Spinner
-            android:id="@+id/times"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/groupTime"
             android:layout_width="match_parent"
-            android:layout_height="56dp" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:hint="Dars Vaqtlari" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/daysLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/back"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timesLayout">
 
-        <Spinner
-            android:id="@+id/days"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/groupday"
             android:layout_width="match_parent"
-            android:layout_height="56dp" />
+            android:layout_height="wrap_content"
+            android:hint="Dars Kunlari" />
 
-    </LinearLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/save"

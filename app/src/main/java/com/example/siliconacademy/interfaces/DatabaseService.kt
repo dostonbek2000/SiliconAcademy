@@ -22,7 +22,7 @@ interface DatabaseService {
 
 
     fun addGroup(group: Group)
-    fun getAllGroupsList(): ArrayList<Group>
+  //  fun getAllGroupsList(): ArrayList<Group>
     fun editGroup(group: Group): Int
     fun deleteGroup(group: Group)
     fun getGroupById(id: Int): Group

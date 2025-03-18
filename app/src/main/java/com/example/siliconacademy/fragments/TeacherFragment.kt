@@ -1,180 +1,215 @@
 package com.example.siliconacademy.fragments
 
+import android.app.Activity
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.provider.OpenableColumns
+import android.util.Log
+import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.siliconacademy.R
 import com.example.siliconacademy.adapters.TeacherRvAdapter
+import com.example.siliconacademy.databinding.FragmentAddTeacherBinding
 import com.example.siliconacademy.databinding.FragmentTeacherBinding
 import com.example.siliconacademy.databinding.TeacherAddBinding
-import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Teacher
+import com.example.siliconacademy.models.TeacherViewModel
 import com.example.siliconacademy.utils.Object.teacherId
+
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
 class TeacherFragment : Fragment() {
 
     private lateinit var binding: FragmentTeacherBinding
-    private lateinit var codialDatabase: CodialDatabase
-    private lateinit var teacherList: ArrayList<Teacher>
     private lateinit var adapter: TeacherRvAdapter
-
+    private val teacherList = ArrayList<Teacher>()
     private var query: Int? = null
+    private var imagePickCallback: ((Uri) -> Unit)? = null
+    private var filePickCallback: ((Uri) -> Unit)? = null
+    private val viewModel: TeacherViewModel by viewModels()
+    private var param1: String? = null
+    private var param2: String? = null
+    private var isUiReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        codialDatabase = CodialDatabase(requireContext())
-        teacherList = codialDatabase.getAllTeachersList()
         query = arguments?.getInt("query")
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
 
         adapter = TeacherRvAdapter(object : TeacherRvAdapter.OnItemClick {
             override fun onItemClick(teacher: Teacher, position: Int) {
                 teacherId = teacher.id
                 when (query) {
                     1 -> {
-                        findNavController().navigate(
-                            R.id.teacherInfoFragment,
-                            bundleOf("course" to teacher)
-                        )
+                        val bundle = Bundle().apply {
+                            putSerializable("course", teacher)
+                        }
+                        findNavController().navigate(R.id.teacherInfoFragment, bundle)
                     }
-
-                    2 -> {
-                        findNavController().navigate(
-                            R.id.groupHomeFragment,
-                            bundleOf("course" to teacher)
-                        )
-
-
-                    }
-
-                    3 -> {
-                        findNavController().navigate(
-                            R.id.teacherFragment,
-                            bundleOf("course" to teacher)
-                        )
-                    }
+                    2 -> findNavController().navigate(
+                        R.id.groupHomeFragment,
+                        bundleOf("course" to teacher)
+                    )
+                    3 -> findNavController().navigate(
+                        R.id.teacherFragment,
+                        bundleOf("course" to teacher)
+                    )
                 }
-
             }
 
             override fun onItemDeleteClick(teacher: Teacher, position: Int) {
-                val alertDialog = android.app.AlertDialog.Builder(requireContext())
-
-                alertDialog.setTitle("Eslatma!")
-                alertDialog.setMessage("Rostan ham o'chirmoqchimisiz?")
-                alertDialog.setPositiveButton("Ha") { _, _ ->
-
-                    codialDatabase.deleteTeacher(teacher) // Remove from DB
-                    teacherList.remove(teacher) // Remove from the list
-                    adapter.notifyItemRemoved(position) // Notify the adapter
-
-                    adapter.notifyDataSetChanged()
-                    adapter.notifyItemRangeRemoved(position, teacherList.size)
-
-                    alertDialog.create().dismiss()
-                }
-
-                alertDialog.setNegativeButton("Yo'q") { _, _ ->
-                    alertDialog.create().dismiss()
-                }
-
-                alertDialog.show()
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Eslatma!")
+                    .setMessage("Rostan ham o'chirmoqchimisiz?")
+                    .setPositiveButton("Ha") { _, _ ->
+                        teacher.id?.let { viewModel.deleteTeacher(it) }
+                        teacherList.removeAt(position)
+                        adapter.notifyItemRemoved(position)
+                    }
+                    .setNegativeButton("Yo‘q", null)
+                    .show()
             }
 
             override fun onItemEditClick(teacher: Teacher, position: Int) {
-                val alertDialog = android.app.AlertDialog.Builder(requireContext()).create()
-                val binding =
-                    TeacherAddBinding.inflate(requireActivity().layoutInflater)
-                alertDialog.setView(binding.root)
-
-                // Set existing student details
-                binding.courseTitle.setText(teacher.title)
-                binding.courseDesc.setText(teacher.desc)
-                binding.courseAge.setText(teacher.age)
-                binding.courseSubject.setText(teacher.subject)
-
-
-                binding.add.setOnClickListener {
-                    val name: String = binding.courseTitle.text.toString().trim()
-                    val fatherName: String = binding.courseDesc.text.toString().trim()
-                    val age:String=binding.courseAge.text.toString().trim()
-                    val subject:String=binding.courseSubject.text.toString().trim()
-
-                    if (name.isNotEmpty() && fatherName.isNotEmpty()&&age.isNotEmpty()&&subject.isNotEmpty()) {
-                        teacher.title = name
-                        teacher.desc = fatherName
-                        teacher.age=age
-                        teacher.subject=subject
-
-                        codialDatabase.editTeacher(teacher) // Update student in the database
-
-                        adapter.notifyItemChanged(position) // Refresh only the changed item
-                        alertDialog.dismiss()
-                    } else {
-                        binding.courseTitle.error = "Malumot yo'q"
-                        binding.courseDesc.error = "Malumot yo'q"
-                    }
-                }
-
-                alertDialog.show()
+                findNavController().navigate(R.id.editTeacherFragment, bundleOf("teacher" to teacher))
             }
         }, teacherList)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentTeacherBinding.inflate(layoutInflater, container, false)
+        binding = FragmentTeacherBinding.inflate(inflater, container, false)
 
-        when (query) {
-            1 -> {
-                binding.toolBar.inflateMenu(R.menu.add)
-                binding.toolBar.setOnMenuItemClickListener {
-                    val alertDialog = AlertDialog.Builder(requireContext()).create()
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = adapter
 
-                    val addDialog =
-                        TeacherAddBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+        viewModel.teachers.observe(viewLifecycleOwner) {
+            teacherList.clear()
+            teacherList.addAll(it.reversed()) // Show latest teachers at top
+            adapter.notifyDataSetChanged()
+            binding.emptyText.visibility = if (teacherList.isEmpty()) View.VISIBLE else View.GONE
+            binding.progressBar.visibility = View.GONE
+        }
 
-                    alertDialog.setView(addDialog.root)
-
-                    addDialog.add.setOnClickListener {
-                        val courseTitle: String = addDialog.courseTitle.text.toString()
-                        val courseDesc: String = addDialog.courseDesc.text.toString()
-                        val age:String=addDialog.courseAge.text.toString().trim()
-                        val subject:String=addDialog.courseSubject.text.toString().trim()
-
-                        codialDatabase.addTeacher(Teacher(courseTitle, courseDesc,age,subject))
-                        teacherList.add(Teacher(courseTitle, courseDesc,age,subject))
-                        adapter.notifyItemInserted(teacherList.size)
-
-                        alertDialog.dismiss()
-                    }
-
-                    addDialog.close.setOnClickListener {
-                        alertDialog.dismiss()
-                    }
-
-                    alertDialog.show()
-                    true
-                }
-            }
-
-            2 -> {
-
-            }
-
-            3 -> {
-
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            if (isUiReady) {
+                binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
             }
         }
 
-        binding.recyclerView.adapter = adapter
+        viewModel.message.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
 
+        viewModel.getTeachers()
+
+        if (query == 1) {
+            binding.toolBar.inflateMenu(R.menu.add)
+            binding.toolBar.setOnMenuItemClickListener {
+                findNavController().navigate(R.id.addTeacherFragment)
+                true
+            }
+        }
+
+        isUiReady = true
         return binding.root
+    }
+
+    private fun pickImageFromGallery(callback: (Uri) -> Unit) {
+        imagePickCallback = callback
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" }
+        startActivityForResult(intent, IMAGE_PICK_CODE)
+    }
+
+    private fun pickFileFromStorage(callback: (Uri) -> Unit) {
+        filePickCallback = callback
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ))
+        }
+        startActivityForResult(intent, FILE_PICK_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            val uri = data.data
+            when (requestCode) {
+                IMAGE_PICK_CODE -> uri?.let { imagePickCallback?.invoke(it) }
+                FILE_PICK_CODE -> uri?.let {
+                    try {
+                        requireContext().contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    } catch (e: SecurityException) {
+                        e.printStackTrace()
+                    }
+                    filePickCallback?.invoke(it)
+                }
+            }
+        }
+    }
+
+    private fun getFileNameFromUri(uriString: String?): String {
+        return if (!uriString.isNullOrEmpty()) {
+            try {
+                getFileName(Uri.parse(uriString))
+            } catch (e: Exception) {
+                uriString.substringAfterLast("/")
+            }
+        } else "\uD83D\uDCCE Fayl mavjud emas"
+    }
+
+    private fun getFileName(uri: Uri): String {
+        var name = ""
+        val cursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (it.moveToFirst() && nameIndex >= 0) {
+                name = it.getString(nameIndex)
+            }
+        }
+        return name
+    }
+
+    companion object {
+        private const val IMAGE_PICK_CODE = 1001
+        private const val FILE_PICK_CODE = 1002
+
+        fun newInstance(param1: String, param2: String) =
+            TeacherFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
+
+    private fun isUriValid(uri: Uri): Boolean {
+        return try {
+            val cursor = requireContext().contentResolver.query(uri, null, null, null, null)
+            val isValid = cursor != null
+            cursor?.close()
+            isValid
+        } catch (e: Exception) {
+            Log.e("TeacherFragment", "Error validating URI: ${e.message}")
+            false
+        }
     }
 }

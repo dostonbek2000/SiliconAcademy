@@ -11,12 +11,13 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.StudentItemBinding
-import com.example.siliconacademy.db.CodialDatabase
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 class StudentRvAdapter(
     private val onItemClick: OnItemClick,
-    private var itemList: ArrayList<Student>,
-    private val codialDatabase: CodialDatabase
+    private var itemList: ArrayList<Student>
 
     // ✅ Database passed as parameter
 ) : RecyclerView.Adapter<StudentRvAdapter.StudentVh>() {
@@ -31,7 +32,7 @@ class StudentRvAdapter(
 
             binding.studentFullName.text = "${student.name} ${student.surname}"
             binding.paymentStatus.text = student.accountBalance.toString()
-            binding.date.text=student.date.toString()
+            binding.date.text=formatDateToReadable(student.date.toString())
             binding.root.setOnClickListener {
                 onItemClick.onItemClick(student, position)
             }
@@ -40,8 +41,24 @@ class StudentRvAdapter(
             }
         }
 
+        fun updateList(newList: List<Student>) {
+            itemList.clear()
+            itemList.addAll(newList)
+            notifyDataSetChanged()
+        }
 
+        fun formatDateToReadable(dateString: String): String {
+            return try {
+                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                parser.timeZone = TimeZone.getTimeZone("UTC")
+                val date = parser.parse(dateString)
 
+                val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                formatter.format(date!!)
+            } catch (e: Exception) {
+                dateString // fallback to original if something goes wrong
+            }
+        }
         private fun showPopupMenu(view: View, student: Student, position: Int) {
             val popupMenu = PopupMenu(view.context, view)
             popupMenu.menuInflater.inflate(R.menu.pop, popupMenu.menu)

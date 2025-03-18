@@ -112,5 +112,20 @@
         android:name="com.example.siliconacademy.fragments.StudentInfoFragment"
         android:label="fragment_student_info"
         tools:layout="@layout/fragment_student_info" />
+    <fragment
+        android:id="@+id/addTeacherFragment"
+        android:name="com.example.siliconacademy.fragments.AddTeacherFragment"
+        android:label="fragment_add_teacher"
+        tools:layout="@layout/fragment_add_teacher" />
+    <fragment
+        android:id="@+id/editTeacherFragment"
+        android:name="com.example.siliconacademy.fragments.EditTeacherFragment"
+        android:label="fragment_edit_teacher"
+        tools:layout="@layout/fragment_edit_teacher" />
+    <fragment
+        android:id="@+id/paymentHomeFragment"
+        android:name="com.example.siliconacademy.fragments.PaymentHomeFragment"
+        android:label="fragment_payment_home"
+        tools:layout="@layout/fragment_payment_home" />
 
 </navigation>

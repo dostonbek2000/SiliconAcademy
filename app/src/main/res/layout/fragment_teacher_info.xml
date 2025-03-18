@@ -1,49 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<androidx.appcompat.widget.Toolbar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintLeft_toLeftOf="parent"
-    android:id="@+id/toolBar"
-    app:title="Course title"
-    android:background="@color/mainColor"/>
-    <TextView
-        android:layout_width="wrap_content"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/desc"
-        app:layout_constraintTop_toBottomOf="@id/toolBar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_margin="10dp"
-        android:text="Description "
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/age"
-        app:layout_constraintTop_toBottomOf="@id/desc"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_margin="10dp"
-        android:text="Age "
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/subject"
-        app:layout_constraintTop_toBottomOf="@id/age"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_margin="10dp"
-        android:text="Subject "
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Profile Image -->
+
+        <!-- Name -->
+        <TextView
+            android:id="@+id/teacherName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ism Familya"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp" />
+
+        <!-- University -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Universitet"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/teacherUniversity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="O'qigan universitet"
+            android:textColor="#2C2C2C"
+            android:layout_marginTop="4dp" />
+
+        <!-- Age -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yosh"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/teacherAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="25"
+            android:textColor="#2C2C2C"
+            android:layout_marginTop="4dp" />
+
+        <!-- Subject -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fan"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/teacherSubject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Matematika"
+            android:textColor="#2C2C2C"
+            android:layout_marginTop="4dp" />
+
+        <!-- Toifa -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Toifa"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/teacherToifa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1-toifa"
+            android:textColor="#2C2C2C"
+            android:layout_marginTop="4dp" />
+
+        <!-- Certificate A (Image) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sertifikat A"
+            android:textStyle="bold"
+            android:id="@+id/a_name"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/black" />
+
+        <ImageView
+            android:id="@+id/teacherCertImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scaleType="fitXY"
+            android:contentDescription="Certificate Image"
+            />
+
+        <!-- Certificate B (File) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sertifikat B"
+            android:textStyle="bold"
+            android:id="@+id/b_name"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/teacherFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="teacher_cv.pdf"
+            android:textColor="@color/blue"
+            android:layout_marginTop="4dp" />
+
+        <!-- Close Button -->
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yopish"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="@color/secondColor"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

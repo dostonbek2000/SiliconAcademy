@@ -124,7 +124,40 @@
                     android:text="10.10.2007"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:layout_marginBottom="16dp"
                     android:textColor="@color/black"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ustoz ismi"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"/>
+            <TextView
+                android:id="@+id/teacher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Abdulhay"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="16dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guruh nomi"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"/>
+
+
+            <TextView
+                android:id="@+id/group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Spes 1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"
+                android:textColor="@color/black"/>
             </LinearLayout>
 
 

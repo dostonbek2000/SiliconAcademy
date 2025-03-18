@@ -7,6 +7,41 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     tools:context=".fragments.AddPaymentFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/teacherLayout"
+        android:layout_marginTop="10dp"
+app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        >
+        <Spinner
+            android:id="@+id/teacherSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:pointerIcon="arrow"
+            android:background="@android:drawable/editbox_background"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/group_layout"
+        android:layout_marginTop="10dp"
+
+        app:layout_constraintTop_toBottomOf="@id/teacherLayout"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        >
+        <Spinner
+            android:id="@+id/groupSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:pointerIcon="arrow"
+            android:background="@android:drawable/editbox_background"
+            />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,16 +51,15 @@
 
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/group_layout"
         app:layout_constraintBottom_toTopOf="@id/paymentLayout"
         >
-        <Spinner
-            android:id="@+id/nameSpinner"
+        <AutoCompleteTextView
+            android:id="@+id/nameAutoComplete"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:pointerIcon="arrow"
-            android:background="@android:drawable/editbox_background"
-            />
+            android:layout_height="wrap_content"
+            android:hint="Talaba ismini yozing"
+            android:inputType="text" />
     </LinearLayout>
 
 
@@ -42,6 +76,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/paymentAmount"
             android:layout_width="match_parent"
+            android:inputType="number"
             android:layout_height="wrap_content"
             android:hint="To'lov miqdori"/>
     </com.google.android.material.textfield.TextInputLayout>

@@ -9,7 +9,7 @@ class Group {
     var groupTime: String? = null
     var groupDay: String? = null
     var courseId: Teacher? = null
-    var fee: String? = null
+    var fee: Double? = null
 
 
     constructor(
@@ -21,7 +21,7 @@ class Group {
         groupDay: String?,
 
         courseId: Teacher,
-        fee: String?
+        fee: Double?
     ) {
         this.id = id
         this.groupPosition = groupPosition
@@ -43,7 +43,7 @@ class Group {
         groupDay: String?,
 
         courseId: Teacher,
-        fee: String?
+        fee: Double?
     ) {
         this.groupPosition = groupPosition
         this.groupTitle = groupTitle

@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.resultHomeFragment, bundleOf("query" to 4))
         }
         binding.payment.setOnClickListener {
-            findNavController().navigate(R.id.paymentFragment, bundleOf("query" to 5))
+            findNavController().navigate(R.id.paymentHomeFragment, bundleOf("query" to 5))
         }
 
         return binding.root

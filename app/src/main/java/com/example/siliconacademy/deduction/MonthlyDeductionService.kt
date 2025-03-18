@@ -11,12 +11,13 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
-import com.example.siliconacademy.db.CodialDatabase
+import com.example.siliconacademy.models.StudentViewModel
 
 class MonthlyDeductionService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
+   private lateinit var viewModel: StudentViewModel
 
     override fun onCreate() {
         super.onCreate()
@@ -27,9 +28,8 @@ class MonthlyDeductionService : Service() {
     private fun startRepeatingDeduction() {
         runnable = object : Runnable {
             override fun run() {
-                val db = CodialDatabase.getInstance(applicationContext)
-                db.resetAllStudentsRemovedStatus(applicationContext)
-                db.deductMonthlyFeeForEachStudent(applicationContext)
+                viewModel.deductMonthlyFeeForEligibleStudents()
+                viewModel.resetAllStudentsRemovedStatus()
                 handler.postDelayed(this, 60_000) // Run every 60 seconds
             }
         }
