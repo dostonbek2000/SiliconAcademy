@@ -1,137 +1,137 @@
 package com.example.siliconacademy.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.R
 import com.example.siliconacademy.adapters.CourseRvAdapter
 import com.example.siliconacademy.databinding.CourseAddBinding
 import com.example.siliconacademy.databinding.FragmentCourseBinding
-import com.example.siliconacademy.databinding.TeacherAddBinding
-import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Course
-import com.example.siliconacademy.models.Teacher
-
+import com.example.siliconacademy.models.CourseViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class CourseFragment : Fragment() {
-private lateinit var binding:FragmentCourseBinding
-private lateinit var database:CodialDatabase
-private lateinit var courseList:ArrayList<Course>
-private lateinit var adapter: CourseRvAdapter
 
+    private lateinit var binding: FragmentCourseBinding
+    private lateinit var adapter: CourseRvAdapter
+    private val viewModel: CourseViewModel by viewModels()
+    private val courseList: MutableList<Course> = mutableListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        database=CodialDatabase(requireContext())
-        courseList=database.getAllCourseList()
-        adapter=CourseRvAdapter(
-            object : CourseRvAdapter.OnItemClick {
-                override fun onItemClick(course: Course, position: Int) {
-                    findNavController().navigate(R.id.courseInfoFragment, bundleOf("course" to course))
-                }
 
-                override fun onItemDeleteClick(course: Course, position: Int) {
-                    val alertDialog = android.app.AlertDialog.Builder(requireContext())
-
-                    alertDialog.setTitle("Eslatma!")
-                    alertDialog.setMessage("Rostan ham o'chirmoqchimisiz?")
-                    alertDialog.setPositiveButton("Ha") { _, _ ->
-
-                        database.deleteCourse(course) // Remove from DB
-                        courseList.remove(course) // Remove from the list
-                        adapter.notifyItemRemoved(position) // Notify the adapter
-
-                        adapter.notifyDataSetChanged()
-                        adapter.notifyItemRangeRemoved(position, courseList.size)
-
-                        alertDialog.create().dismiss()
-                    }
-
-                    alertDialog.setNegativeButton("Yo'q") { _, _ ->
-                        alertDialog.create().dismiss()
-                    }
-
-                    alertDialog.show()
-                }
-
-                override fun onItemEditClick(course: Course, position: Int) {
-                    val alertDialog = android.app.AlertDialog.Builder(requireContext()).create()
-                    val binding =
-                        CourseAddBinding.inflate(requireActivity().layoutInflater)
-                    alertDialog.setView(binding.root)
-
-                    // Set existing student details
-                    binding.courseTitle.setText(course.title)
-                    binding.courseDesc.setText(course.description)
-
-
-                    binding.add.setOnClickListener {
-                        val title: String = binding.courseTitle.text.toString().trim()
-                        val desc: String = binding.courseDesc.text.toString().trim()
-
-                        if (title.isNotEmpty() && desc.isNotEmpty()) {
-                            course.title = title
-                            course.description = desc
-
-                            database.editCourse(course) // Update student in the database
-
-                            adapter.notifyItemChanged(position) // Refresh only the changed item
-                            alertDialog.dismiss()
-                        } else {
-                            binding.courseTitle.error = "Malumot yo'q"
-                            binding.courseDesc.error = "Malumot yo'q"
-                        }
-                    }
-
-                    alertDialog.show()
-                }
-            },
-            courseList
-        )
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        binding = FragmentCourseBinding.inflate(inflater, container, false)
 
-      binding=FragmentCourseBinding.inflate(layoutInflater,container,false)
         binding.toolBar.inflateMenu(R.menu.add)
 
+        adapter = CourseRvAdapter(object : CourseRvAdapter.OnItemClick {
+            override fun onItemClick(course: Course, position: Int) {
+                val bundle = Bundle().apply {
+                    putSerializable("course", course)
+                }
+                findNavController().navigate(R.id.courseInfoFragment, bundle)
+            }
+
+            override fun onItemDeleteClick(course: Course, position: Int) {
+                AlertDialog.Builder(requireContext()).apply {
+                    setTitle("Eslatma!")
+                    setMessage("Rostan ham o‘chirmoqchimisiz?")
+                    setPositiveButton("Ha") { _, _ ->
+                        course.id?.let { viewModel.deleteCourse(it) }
+                    }
+                    setNegativeButton("Yo‘q", null)
+                    show()
+                }
+            }
+
+            override fun onItemEditClick(course: Course, position: Int) {
+                val alertDialog = AlertDialog.Builder(requireContext()).create()
+                val dialogBinding = CourseAddBinding.inflate(layoutInflater)
+                alertDialog.setView(dialogBinding.root)
+
+                dialogBinding.courseTitle.setText(course.title)
+                dialogBinding.courseDesc.setText(course.description)
+
+                dialogBinding.add.setText("Update")
+
+                dialogBinding.add.setOnClickListener {
+                    val title = dialogBinding.courseTitle.text.toString().trim()
+                    val desc = dialogBinding.courseDesc.text.toString().trim()
+
+                    if (title.isNotEmpty() && desc.isNotEmpty()) {
+                        course.id?.let { id -> viewModel.updateCourse(id, title, desc) }
+                        alertDialog.dismiss()
+                    } else {
+                        dialogBinding.courseTitle.error = "Majburiy"
+                        dialogBinding.courseDesc.error = "Majburiy"
+                    }
+                }
+
+                dialogBinding.close.setOnClickListener {
+                    alertDialog.dismiss()
+                }
+
+                alertDialog.show()
+            }
+        }, courseList as ArrayList<Course>)
+
+        binding.recyclerView.adapter = adapter
+
+        // 🌟 Collect courses from ViewModel (StateFlow)
+        lifecycleScope.launch {
+            viewModel.courseList.collectLatest { newList ->
+                courseList.clear()
+                courseList.addAll(newList)
+                adapter.notifyDataSetChanged()
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.isLoading.collectLatest { loading ->
+                binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            }
+        }
+
+
+        // 🔄 Initial course fetch
+        viewModel.getCourses()
+
+        // ➕ Add new course
         binding.toolBar.setOnMenuItemClickListener {
-            val alertDialog = AlertDialog.Builder(requireContext()).create()
+            val dialog = AlertDialog.Builder(requireContext()).create()
+            val dialogBinding = CourseAddBinding.inflate(layoutInflater)
+            dialog.setView(dialogBinding.root)
 
-            val addDialog =
-                CourseAddBinding.inflate(LayoutInflater.from(requireContext()), null, false)
+            dialogBinding.add.setOnClickListener {
+                val title = dialogBinding.courseTitle.text.toString().trim()
+                val desc = dialogBinding.courseDesc.text.toString().trim()
 
-            alertDialog.setView(addDialog.root)
-
-            addDialog.add.setOnClickListener {
-                val courseTitle = addDialog.courseTitle.text.toString().trim()
-                val courseDesc = addDialog.courseDesc.text.toString()
-
-                database.addCourse(Course(courseTitle, courseDesc))
-                courseList.add(Course(courseTitle, courseDesc))
-                adapter.notifyItemInserted(courseList.size)
-
-                alertDialog.dismiss()
+                if (title.isNotEmpty() && desc.isNotEmpty()) {
+                    viewModel.createCourse(title, desc)
+                    dialog.dismiss()
+                } else {
+                    dialogBinding.courseTitle.error = "Majburiy"
+                    dialogBinding.courseDesc.error = "Majburiy"
+                }
             }
 
-            addDialog.close.setOnClickListener {
-                alertDialog.dismiss()
+            dialogBinding.close.setOnClickListener {
+                dialog.dismiss()
             }
 
-            alertDialog.show()
+            dialog.show()
             true
         }
 
-        binding.recyclerView.adapter = adapter
         return binding.root
     }
-
-
 }
