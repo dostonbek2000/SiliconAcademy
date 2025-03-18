@@ -2,6 +2,8 @@ package com.example.siliconacademy.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +16,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.siliconacademy.databinding.FragmentAddResultBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Results
+import java.io.File
+import java.io.FileOutputStream
 
 class AddResultFragment : Fragment() {
 
@@ -30,8 +34,11 @@ class AddResultFragment : Fragment() {
         binding = FragmentAddResultBinding.inflate(inflater, container, false)
         database = CodialDatabase.getInstance(requireContext())
 
-        binding.type.adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, testList)
+        binding.type.adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            testList
+        )
 
         binding.imageButton.setOnClickListener {
             pickImageFromGallery()
@@ -53,9 +60,39 @@ class AddResultFragment : Fragment() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
-            imageUri = data?.data
-            binding.image.setImageURI(imageUri)
+            val selectedUri = data?.data
+            selectedUri?.let {
+                val compressedUri = compressAndSaveImageToCache(it)
+                imageUri = compressedUri
+                binding.image.setImageURI(compressedUri)
+            }
+        }
+    }
+
+    private fun compressAndSaveImageToCache(uri: Uri): Uri? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Scale to max width 1080px
+            val targetWidth = 1080
+            val targetHeight = (originalBitmap.height * targetWidth) / originalBitmap.width
+
+            val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, targetWidth, targetHeight, true)
+
+            val file = File(requireContext().cacheDir, "compressed_${System.currentTimeMillis()}.jpg")
+            val outputStream = FileOutputStream(file)
+
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            Uri.fromFile(file)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
@@ -90,7 +127,7 @@ class AddResultFragment : Fragment() {
             testType = testType,
             teacherName = teacherName,
             subject = subject,
-            imageUri = imageUri.toString() // Store image URI
+            imageUri = imageUri.toString()
         )
 
         database.addResult(result)

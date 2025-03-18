@@ -18,8 +18,8 @@ import com.example.siliconacademy.databinding.EditTeacherBinding
 import com.example.siliconacademy.databinding.FragmentGroupsBinding
 import com.example.siliconacademy.utils.Object.teacherId
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+const val ARG_PARAM1 = "param1"
+const val ARG_PARAM2 = "param2"
 
 class GroupsFragment : Fragment() {
 

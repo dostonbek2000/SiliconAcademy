@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.siliconacademy.R
 import com.example.siliconacademy.databinding.ActivityMainBinding
 import com.example.siliconacademy.deduction.DeductionAlarmReceiver
 
@@ -17,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        window.statusBarColor = ContextCompat.getColor(this, R.color.mainColor)
       scheduleRepeatingDeductionCheck()
     }
 
