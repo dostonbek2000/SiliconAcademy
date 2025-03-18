@@ -11,6 +11,7 @@ data class Results(
     var testType:String,
     var teacherName:String,
     var subject: String,
-    var imageUri: String? = null
+    var imageUri: String? = null,
+    var fileUri: String? = null
 
 ) : Serializable

@@ -2,10 +2,10 @@ package com.example.siliconacademy.fragments
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,39 +13,76 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.siliconacademy.databinding.FragmentAddResultBinding
 import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Results
-import java.io.File
-import java.io.FileOutputStream
 
 class AddResultFragment : Fragment() {
 
     private lateinit var binding: FragmentAddResultBinding
-    private lateinit var database: CodialDatabase
-    private var imageUri: Uri? = null
-
-    private val testList = arrayOf("DTM", "IELTS", "CEFR")
+    private lateinit var codialDatabase: CodialDatabase
+    private var selectedImageUri: Uri? = null
+    private var selectedFileUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAddResultBinding.inflate(inflater, container, false)
-        database = CodialDatabase.getInstance(requireContext())
+        codialDatabase = CodialDatabase(requireContext())
 
-        binding.type.adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            testList
-        )
+        val testTypes = arrayOf("DTM", "IELTS", "CEFR")
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, testTypes)
+        binding.type.adapter = spinnerAdapter
 
-        binding.imageButton.setOnClickListener {
+        binding.downloadImage.setOnClickListener {
             pickImageFromGallery()
         }
 
+        binding.downloadFile.setOnClickListener {
+            pickFileFromStorage()
+        }
+
         binding.save.setOnClickListener {
-            saveResult()
+            val name = binding.name.text.toString().trim()
+            val subject = binding.subject.text.toString().trim()
+            val age = binding.age.text.toString().trim()
+            val teacherName = binding.teacherName.text.toString().trim()
+            val testType = binding.type.selectedItem?.toString() ?: ""
+
+            if (name.isEmpty() || subject.isEmpty() || age.isEmpty() || teacherName.isEmpty() || testType.isEmpty()) {
+                Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val newPosition = when (testType) {
+                "DTM" -> 0
+                "IELTS" -> 1
+                "CEFR" -> 2
+                else -> -1
+            }
+
+            if (newPosition == -1) {
+                Toast.makeText(requireContext(), "Test turi noto‘g‘ri!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val result = Results(
+                name = name,
+                subject = subject,
+                age = age,
+                teacherName = teacherName,
+                testType = testType,
+                resultPosition = newPosition,
+                imageUri = selectedImageUri?.toString(),
+                fileUri = selectedFileUri?.toString()
+            )
+
+            codialDatabase.addResult(result)
+
+            Toast.makeText(requireContext(), "Saqlandi!", Toast.LENGTH_SHORT).show()
+            findNavController().popBackStack()
         }
 
         return binding.root
@@ -57,86 +94,60 @@ class AddResultFragment : Fragment() {
         startActivityForResult(intent, IMAGE_PICK_CODE)
     }
 
-    @Deprecated("Deprecated in Java")
+    private fun pickFileFromStorage() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) // Use OPEN_DOCUMENT instead of GET_CONTENT
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "*/*"
+        val mimeTypes = arrayOf(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        startActivityForResult(intent, FILE_PICK_CODE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
-            val selectedUri = data?.data
-            selectedUri?.let {
-                val compressedUri = compressAndSaveImageToCache(it)
-                imageUri = compressedUri
-                binding.image.setImageURI(compressedUri)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            when (requestCode) {
+                IMAGE_PICK_CODE -> {
+                    selectedImageUri = data.data
+                    binding.image.setImageURI(selectedImageUri)
+                }
+                FILE_PICK_CODE -> {
+                    selectedFileUri = data.data
+                    selectedFileUri?.let {
+                        try {
+                            // Take persistable permission
+                            requireContext().contentResolver.takePersistableUriPermission(
+                                it,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+                        } catch (e: SecurityException) {
+                            e.printStackTrace()
+                        }
+                        val fileName = getFileName(it)
+                        binding.fileName.text = "📎 Fayl: $fileName"
+                    }
+                }
             }
         }
     }
 
-    private fun compressAndSaveImageToCache(uri: Uri): Uri? {
-        return try {
-            val inputStream = requireContext().contentResolver.openInputStream(uri)
-            val originalBitmap = BitmapFactory.decodeStream(inputStream)
-
-            // Scale to max width 1080px
-            val targetWidth = 1080
-            val targetHeight = (originalBitmap.height * targetWidth) / originalBitmap.width
-
-            val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, targetWidth, targetHeight, true)
-
-            val file = File(requireContext().cacheDir, "compressed_${System.currentTimeMillis()}.jpg")
-            val outputStream = FileOutputStream(file)
-
-            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
-            outputStream.flush()
-            outputStream.close()
-
-            Uri.fromFile(file)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    private fun getFileName(uri: Uri): String {
+        var name = ""
+        val cursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                name = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
         }
-    }
-
-    private fun saveResult() {
-        val name = binding.name.text.toString().trim()
-        val subject = binding.subject.text.toString().trim()
-        val age = binding.age.text.toString().trim()
-        val teacherName = binding.teacherName.text.toString().trim()
-        val testType = binding.type.selectedItem?.toString() ?: ""
-
-        if (name.isEmpty() || subject.isEmpty() || age.isEmpty() || teacherName.isEmpty() || imageUri == null || testType.isEmpty()) {
-            Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val position = when (testType) {
-            "DTM" -> 0
-            "IELTS" -> 1
-            "CEFR" -> 2
-            else -> -1
-        }
-
-        if (position == -1) {
-            Toast.makeText(requireContext(), "Test turi noto‘g‘ri!", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val result = Results(
-            resultPosition = position,
-            name = name,
-            age = age,
-            testType = testType,
-            teacherName = teacherName,
-            subject = subject,
-            imageUri = imageUri.toString()
-        )
-
-        database.addResult(result)
-
-        Toast.makeText(requireContext(), "Natija saqlandi!", Toast.LENGTH_SHORT).show()
-        findNavController().popBackStack()
+        return name
     }
 
     companion object {
-        private const val IMAGE_PICK_CODE = 1000
+        private const val IMAGE_PICK_CODE = 1001
+        private const val FILE_PICK_CODE = 1002
     }
 }

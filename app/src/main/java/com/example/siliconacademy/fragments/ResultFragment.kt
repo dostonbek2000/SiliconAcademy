@@ -1,11 +1,12 @@
 package com.example.siliconacademy.fragments
-
 import android.app.Activity
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,8 @@ import com.example.siliconacademy.db.CodialDatabase
 import com.example.siliconacademy.models.Results
 import java.io.File
 import java.io.FileOutputStream
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
 class ResultFragment : Fragment() {
 
@@ -31,18 +34,48 @@ class ResultFragment : Fragment() {
     private lateinit var codialDatabase: CodialDatabase
     private lateinit var adapter: ResultRvAdapter
     private lateinit var resultList: ArrayList<Results>
+    private lateinit var resultsList: ArrayList<Results>
     private var imageUri: Uri? = null
+    private var fileUri: Uri? = null
+    private var param1:String?=null
+    private var param2:String?=null
     private var imagePickCallback: ((Uri) -> Unit)? = null
-
+    private var filePickCallback: ((Uri) -> Unit)? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        codialDatabase=CodialDatabase(requireContext())
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentResultBinding.inflate(inflater, container, false)
-        codialDatabase = CodialDatabase(requireContext())
-
-        val allResults = codialDatabase.getAllResultsList()
-        resultList = ArrayList(allResults)
+        resultsList=codialDatabase.getAllResultsList()
+        resultList=ArrayList()
+        resultList.clear()
+        when (param1) {
+            "0" -> for (i in resultsList.indices) {
+                if (resultsList[i].resultPosition == 0) {
+                    resultList.add(resultsList[i])
+                }
+            }
+            "1" -> {
+                for (i in resultsList.indices) {
+                    if (resultsList[i].resultPosition == 1) {
+                        resultList.add(resultsList[i])
+                    }
+                }
+            }
+            else -> for (i in resultsList.indices){
+                if (resultsList[i].resultPosition==2){
+                    resultList.add(resultsList[i])
+                }
+            }
+        }
 
         adapter = ResultRvAdapter(resultList, object : ResultRvAdapter.OnItemClick {
             override fun onItemClick(results: Results, position: Int) {
@@ -53,11 +86,7 @@ class ResultFragment : Fragment() {
 
             override fun onItemEditClick(results: Results, position: Int) {
                 val alertDialog = AlertDialog.Builder(requireContext()).create()
-                val dialogBinding = FragmentAddResultBinding.inflate(
-                    LayoutInflater.from(requireContext()),
-                    null,
-                    false
-                )
+                val dialogBinding = FragmentAddResultBinding.inflate(LayoutInflater.from(requireContext()), null, false)
                 alertDialog.setView(dialogBinding.root)
 
                 dialogBinding.name.setText(results.name)
@@ -66,27 +95,28 @@ class ResultFragment : Fragment() {
                 dialogBinding.teacherName.setText(results.teacherName)
 
                 val testTypes = arrayOf("DTM", "IELTS", "CEFR")
-                val spinnerAdapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    testTypes
-                )
+                val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, testTypes)
                 dialogBinding.type.adapter = spinnerAdapter
                 results.resultPosition?.let { dialogBinding.type.setSelection(it) }
 
-                // Show current image
-                Glide.with(requireContext())
-                    .load(Uri.parse(results.imageUri))
-                    .into(dialogBinding.image)
+                Glide.with(requireContext()).load(Uri.parse(results.imageUri)).into(dialogBinding.image)
+                dialogBinding.fileName.text = getFileNameFromUri(results.fileUri)
 
                 var updatedImageUri: Uri? = Uri.parse(results.imageUri)
+                var updatedFileUri: Uri? = Uri.parse(results.fileUri)
 
-                dialogBinding.imageButton.setOnClickListener {
-                    imagePickCallback = { uri ->
-                        updatedImageUri = uri
-                        dialogBinding.image.setImageURI(uri)
+                dialogBinding.downloadImage.setOnClickListener {
+                    pickImageFromGallery {
+                        updatedImageUri = it
+                        dialogBinding.image.setImageURI(it)
                     }
-                    pickImageFromGallery()
+                }
+
+                dialogBinding.downloadFile.setOnClickListener {
+                    pickFileFromStorage {
+                        updatedFileUri = it
+                        dialogBinding.fileName.text = getFileName(it)
+                    }
                 }
 
                 dialogBinding.save.setOnClickListener {
@@ -97,11 +127,7 @@ class ResultFragment : Fragment() {
                     val testType = dialogBinding.type.selectedItem?.toString() ?: ""
 
                     if (name.isEmpty() || subject.isEmpty() || age.isEmpty() || teacherName.isEmpty() || testType.isEmpty()) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Barcha maydonlarni to'ldiring!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(requireContext(), "Barcha maydonlarni to'ldiring!", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
@@ -111,10 +137,8 @@ class ResultFragment : Fragment() {
                         "CEFR" -> 2
                         else -> -1
                     }
-
                     if (newPosition == -1) {
-                        Toast.makeText(requireContext(), "Test turi noto‘g‘ri!", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(requireContext(), "Test turi noto‘g‘ri!", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
@@ -125,6 +149,7 @@ class ResultFragment : Fragment() {
                     results.testType = testType
                     results.resultPosition = newPosition
                     results.imageUri = updatedImageUri.toString()
+                    results.fileUri = updatedFileUri?.toString() ?: ""
 
                     codialDatabase.editResult(results)
                     adapter.notifyItemChanged(position)
@@ -155,44 +180,88 @@ class ResultFragment : Fragment() {
         return binding.root
     }
 
-    private fun pickImageFromGallery() {
+    private fun pickImageFromGallery(callback: (Uri) -> Unit) {
+        imagePickCallback = callback
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         startActivityForResult(intent, IMAGE_PICK_CODE)
     }
 
-    @Deprecated("Deprecated in Java")
+    private fun pickFileFromStorage(callback: (Uri) -> Unit) {
+        filePickCallback = callback
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT) // ✅ correct way
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "*/*"
+
+        val mimeTypes = arrayOf(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+        startActivityForResult(intent, FILE_PICK_CODE)
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_PICK_CODE && resultCode == Activity.RESULT_OK) {
-            val selectedUri = data?.data
-            selectedUri?.let {
-                val compressedUri = compressAndSaveImageToCache(it)
-                imageUri = compressedUri
-                imagePickCallback?.invoke(compressedUri!!)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            when (requestCode) {
+                FILE_PICK_CODE -> {
+                    fileUri = data.data
+                    fileUri?.let {
+                        try {
+                            // ✅ take permission PERMANENTLY
+                            requireContext().contentResolver.takePersistableUriPermission(
+                                it,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+                        } catch (e: SecurityException) {
+                            e.printStackTrace()
+                        }
+                        filePickCallback?.invoke(it)
+                    }
+                }
             }
         }
+    }
+
+
+
+
+    private fun getFileNameFromUri(uriString: String?): String {
+        return if (!uriString.isNullOrEmpty()) {
+            try {
+                val uri = Uri.parse(uriString)
+                getFileName(uri)
+            } catch (e: Exception) {
+                uriString.substringAfterLast("/")
+            }
+        } else "📎 Fayl mavjud emas"
+    }
+    private fun getFileName(uri: Uri): String {
+        var name = ""
+        val cursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                name = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
+        }
+        return name
     }
 
     private fun compressAndSaveImageToCache(uri: Uri): Uri? {
         return try {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
             val originalBitmap = BitmapFactory.decodeStream(inputStream)
-
             val targetWidth = 1080
             val targetHeight = (originalBitmap.height * targetWidth) / originalBitmap.width
-
-            val scaledBitmap =
-                Bitmap.createScaledBitmap(originalBitmap, targetWidth, targetHeight, true)
-
-            val file =
-                File(requireContext().cacheDir, "compressed_${System.currentTimeMillis()}.jpg")
+            val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, targetWidth, targetHeight, true)
+            val file = File(requireContext().cacheDir, "compressed_${System.currentTimeMillis()}.jpg")
             val outputStream = FileOutputStream(file)
-
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
             outputStream.flush()
             outputStream.close()
-
             Uri.fromFile(file)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -200,9 +269,10 @@ class ResultFragment : Fragment() {
         }
     }
 
-    companion object {
-        private const val IMAGE_PICK_CODE = 1000
 
+companion object {
+        private const val IMAGE_PICK_CODE = 1000
+    private const val FILE_PICK_CODE = 1002
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ResultFragment().apply {

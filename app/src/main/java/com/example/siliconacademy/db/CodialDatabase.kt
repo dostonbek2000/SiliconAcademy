@@ -47,7 +47,9 @@ import com.example.siliconacademy.utils.Content.PAYMENT_ID
 import com.example.siliconacademy.utils.Content.PAYMENT_MONTH
 import com.example.siliconacademy.utils.Content.PAYMENT_TABLE
 import com.example.siliconacademy.utils.Content.RESULT_AGE
+import com.example.siliconacademy.utils.Content.RESULT_FILE_URI
 import com.example.siliconacademy.utils.Content.RESULT_ID
+import com.example.siliconacademy.utils.Content.RESULT_IMAGE_URI
 import com.example.siliconacademy.utils.Content.RESULT_POSITION
 import com.example.siliconacademy.utils.Content.RESULT_SUBJECT
 import com.example.siliconacademy.utils.Content.RESULT_S_NAME
@@ -141,12 +143,10 @@ class CodialDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $RESULT_TYPE TEXT NOT NULL,
                 $RESULT_T_NAME TEXT NOT NULL,
                 $RESULT_SUBJECT TEXT NOT NULL,
-                image_uri TEXT 
-                               
-                
-            );
-            
-        """.trimIndent()
+                 $RESULT_IMAGE_URI TEXT NOT NULL,
+        $RESULT_FILE_URI TEXT TEXT NOT NULL
+                              );
+            """.trimIndent()
         val courseQuery =
             """CREATE TABLE $COURSE_TABLE(
 $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -187,7 +187,7 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 69) {
+        if (oldVersion < 70) {
             db?.execSQL("DROP TABLE IF EXISTS $PAYMENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $STUDENT_TABLE")
             db?.execSQL("DROP TABLE IF EXISTS $RESULT_TABLE")
@@ -596,7 +596,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
             put(RESULT_T_NAME, result.teacherName)
             put(RESULT_SUBJECT, result.subject)
             put(RESULT_ID, result.id)
-            put("image_uri", result.imageUri)
+            put(RESULT_IMAGE_URI, result.imageUri)
+            put(RESULT_FILE_URI, result.fileUri)
 
         }
         database.insert(RESULT_TABLE, null, contentValues)
@@ -618,7 +619,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 val testType = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_TYPE))
                 val teacherName = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_T_NAME))
                 val subject = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_SUBJECT))
-                val imageUri = cursor.getString(cursor.getColumnIndexOrThrow("image_uri"))
+                val imageUri = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_IMAGE_URI))
+                val fileUri = cursor.getString(cursor.getColumnIndexOrThrow(RESULT_FILE_URI))
 
                 val result = Results(
                     id = id,
@@ -628,7 +630,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     testType = testType,
                     teacherName = teacherName,
                     subject = subject,
-                    imageUri=imageUri
+                    imageUri=imageUri,
+                    fileUri=fileUri
 
                     )
 
@@ -653,6 +656,8 @@ $COURSE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
         contentValues.put(RESULT_TYPE, results.testType)
         contentValues.put(RESULT_T_NAME, results.teacherName)
         contentValues.put(RESULT_SUBJECT, results.subject)
+        contentValues.put(RESULT_IMAGE_URI,results.imageUri)
+        contentValues.put(RESULT_FILE_URI,results.fileUri)
         return database.update(
             RESULT_TABLE, contentValues, "$RESULT_ID=?", arrayOf("${results.id}")
         )
