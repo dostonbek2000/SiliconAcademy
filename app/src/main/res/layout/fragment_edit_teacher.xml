@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    tools:context=".fragments.EditTeacherFragment"
+    android:background="@color/white">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseTitleLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/courseDescLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseTitle"
+                android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ism-familya" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseDescLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/courseAgeLayout"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseTitleLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseDesc"
+                android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="O'qigan yoki o'qiyatgan universitet" />
+
+        </com.google.android.material.textfield.TextInputLayout><com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/courseAgeLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/courseSubjectLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/courseDescLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/courseAge"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Yosh" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseSubjectLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseAgeLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseSubject"
+                android:layout_width="match_parent"
+                android:textAllCaps="false"
+                android:layout_height="wrap_content"
+                android:hint="Fan" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseToifaLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseSubjectLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseToifa"
+                android:layout_width="match_parent"
+                android:textAllCaps="false"
+                android:layout_height="wrap_content"
+                android:hint="Toifa" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseCertificateLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseToifaLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseCertificate"
+                android:layout_width="match_parent"
+                android:textAllCaps="false"
+                android:layout_height="wrap_content"
+                android:hint="1- Sertifickat nomi va bali" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardImage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/courseCertificateLayout"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/download_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rasm yuklash"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/back"
+                    android:contentDescription="Image Preview" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/courseCertificateBLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardImage">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/courseCertificateB"
+                android:layout_width="match_parent"
+                android:textAllCaps="false"
+                android:layout_height="wrap_content"
+                android:hint="2- Sertifickat nomi va bali" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardFile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/courseCertificateBLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/download_file"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fayl yuklash"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <TextView
+                    android:id="@+id/fileName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Fayl nomi"
+                    android:textSize="16sp"
+                    android:textColor="@color/blue" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <Button
+            android:id="@+id/add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yangilash"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/secondColor"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/cardFile"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
